@@ -821,7 +821,7 @@
                     confirmAndAttachPub(temp_qs.pub, function(ret) {});
             }
             function confirmAndAttachPub(hex_pub, cb) {
-                if (hex_pub.length === 266) {
+                if (hex_pub.length === 266 && /^[0-9a-fA-F]+$/.test(hex_pub)) {
                     attachSendAddress(hex_pub, cb);
                 } else
                     cb(null)
