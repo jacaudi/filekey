@@ -1263,6 +1263,12 @@
                     function handleShare(ps_data) {
                         shareEnc(ps_data, function(res) {
                             getDetEcdhPublicKey(function(pub) {
+                                if (pub == null) {
+                                    var html_string = "<span>Share Key is unavailable. Your browser could not generate a deterministic key pair.</span>";
+                                    htmlWriter({char_speed: 8}, html_string, main_inner);
+                                    scrollToBottom();
+                                    return;
+                                }
                                 var combined_buff = combineArrayBuffers(res.salt, res.encrypted_buff);
                                 combined_buff = combineArrayBuffers(pub, combined_buff);
                                 download_ab(new_filename, combined_buff);
