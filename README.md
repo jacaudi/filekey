@@ -63,7 +63,7 @@ Using this deterministic random value, an HKDF with 256 bits of entropy is gener
 
 All low-level cryptographic functions performed within this process are using the web’s built-in SubtleCrypto interface of the Web Crypto API. All encrypted files use a unique randomly generated salt, composed of a 16 byte hash.
 
-> 🛡️ **To understand more details of the encryption process, [see here](how-encryption-works.md).**
+> 🛡️ **To understand more details of the encryption process, [see here](docs/how-encryption-works.md).**
 
 ---
 
@@ -131,7 +131,7 @@ You’ll now have a standalone FileKey app icon that works offline.
 
 ### 🙋‍♂️ Self-Hosting
 
-For those interested in self-hosting FileKey, user Wintech47 put [this awesome guide](self_hosting_guide.md) together. 
+For those interested in self-hosting FileKey, user Wintech47 put [this awesome guide](docs/self_hosting_guide.md) together.
 
 ---
 
