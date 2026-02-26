@@ -1,0 +1,18 @@
+name: Docker Build
+
+on:
+  push:
+    tags: ['v*.*.*']
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build:
+    uses: jacaudi/github-actions/.github/workflows/docker-build.yml@main
+    with:
+      registry: ghcr.io
+      platforms: linux/amd64,linux/arm64
+    secrets:
+      registry-password: ${{ secrets.GITHUB_TOKEN }}

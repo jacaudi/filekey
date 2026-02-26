@@ -1,0 +1,21 @@
+name: Lint
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  go:
+    uses: jacaudi/github-actions/.github/workflows/lint.yml@main
+    with:
+      go: true
+      working-directory: server
+
+  config:
+    uses: jacaudi/github-actions/.github/workflows/lint.yml@main
+    with:
+      yaml: true
+      yamllint-config: .yamllint.yml
+      json: true
