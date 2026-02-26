@@ -8,8 +8,18 @@ on:
 
 jobs:
   go:
-    uses: jacaudi/github-actions/.github/workflows/test.yml@main
-    with:
-      test-framework: go
-      go-version: '1.26'
-      working-directory: server
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.26'
+          cache-dependency-path: server/go.sum
+
+      - name: Copy app into server for embed
+        run: cp -r app server/app
+
+      - name: Test
+        working-directory: server
+        run: go test ./...
