@@ -61,4 +61,15 @@ describe('Share file null guard', () => {
             'handleShare should show error when pub key is null'
         );
     });
+
+    it('handleShare calls getDetEcdhPublicKey before shareEnc to avoid wasted worker calls', () => {
+        const handleShareStart = indexHtml.indexOf('function handleShare(ps_data)');
+        assert.notStrictEqual(handleShareStart, -1, 'handleShare function not found');
+        const getDetEcdhIdx = indexHtml.indexOf('getDetEcdhPublicKey', handleShareStart);
+        const shareEncIdx = indexHtml.indexOf('shareEnc(', handleShareStart);
+        assert.ok(
+            getDetEcdhIdx < shareEncIdx,
+            `getDetEcdhPublicKey (pos ${getDetEcdhIdx}) must appear before shareEnc (pos ${shareEncIdx}) in handleShare`
+        );
+    });
 });
