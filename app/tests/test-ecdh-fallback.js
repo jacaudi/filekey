@@ -38,9 +38,9 @@ describe('Safari ECDH fallback removal', () => {
 
     it('contains error handling that calls inner_cb with success: false', () => {
         assert.strictEqual(
-            indexHtml.includes('Deterministic ECDH key import failed:'),
+            indexHtml.includes('PKCS#8 import failed:'),
             true,
-            'Missing error log for deterministic ECDH import failure'
+            'Missing error log for PKCS#8 import failure in unified builder'
         );
     });
 
