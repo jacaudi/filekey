@@ -11,4 +11,4 @@ permissions:
 
 jobs:
   release:
-    uses: jacaudi/github-actions/.github/workflows/semantic-release.yml@main
+    uses: jacaudi/github-actions/.github/workflows/semantic-release.yml@v0.11.1

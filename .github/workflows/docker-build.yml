@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   build:
-    uses: jacaudi/github-actions/.github/workflows/docker-build.yml@main
+    uses: jacaudi/github-actions/.github/workflows/docker-build.yml@v0.11.1
     with:
       registry: ghcr.io
       platforms: linux/amd64,linux/arm64

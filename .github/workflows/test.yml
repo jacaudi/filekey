@@ -8,7 +8,7 @@ on:
 
 jobs:
   node:
-    uses: jacaudi/github-actions/.github/workflows/test.yml@main
+    uses: jacaudi/github-actions/.github/workflows/test.yml@v0.11.1
     with:
       test-framework: custom
       test-command: node --test app/tests/test-*.js
@@ -16,7 +16,7 @@ jobs:
       artifact-name: test-results-node
 
   go:
-    uses: jacaudi/github-actions/.github/workflows/test.yml@main
+    uses: jacaudi/github-actions/.github/workflows/test.yml@v0.11.1
     with:
       test-framework: go
       working-directory: server
