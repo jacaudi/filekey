@@ -34,9 +34,9 @@ self.addEventListener('fetch', event => {
                 return fetch(event.request).then(networkResponse => {
                     if (networkResponse && networkResponse.ok) {
                         const responseClone = networkResponse.clone();
-                        caches.open(CACHE_NAME).then(cache => {
-                            cache.put(event.request, responseClone);
-                        });
+                        caches.open(CACHE_NAME)
+                            .then(cache => cache.put(event.request, responseClone))
+                            .catch(err => console.error('[SW] cache.put failed:', err));
                     }
                     return networkResponse;
                 });
