@@ -38,9 +38,9 @@ describe('Safari ECDH fallback removal', () => {
 
     it('contains error handling that calls inner_cb with success: false', () => {
         assert.strictEqual(
-            indexHtml.includes('Deterministic ECDH key import failed:'),
+            indexHtml.includes('PKCS#8 import failed:'),
             true,
-            'Missing error log for deterministic ECDH import failure'
+            'Missing error log for PKCS#8 import failure in unified builder'
         );
     });
 
@@ -49,6 +49,14 @@ describe('Safari ECDH fallback removal', () => {
             indexHtml.includes('if(!result.privateKey.success)'),
             true,
             'genDetEcdh should check privateKey.success before assigning keys'
+        );
+    });
+
+    it('genDetEcdh checks result.publicKey.success before assigning keys', () => {
+        assert.strictEqual(
+            indexHtml.includes('if(!result.publicKey.success)'),
+            true,
+            'genDetEcdh should check publicKey.success before assigning keys'
         );
     });
 });
@@ -70,6 +78,27 @@ describe('Share file null guard', () => {
         assert.ok(
             getDetEcdhIdx < shareEncIdx,
             `getDetEcdhPublicKey (pos ${getDetEcdhIdx}) must appear before shareEnc (pos ${shareEncIdx}) in handleShare`
+        );
+    });
+
+    it('convertPublicKeyToRaw has .catch() on importKey Promise', () => {
+        assert.strictEqual(
+            indexHtml.includes('Public key raw import failed:'),
+            true,
+            'convertPublicKeyToRaw must have .catch() on the importKey Promise'
+        );
+    });
+
+    it('buildPKCS8WithPublicKey validates input lengths', () => {
+        assert.strictEqual(
+            indexHtml.includes('privKeyBytes must be 66 bytes'),
+            true,
+            'buildPKCS8WithPublicKey must validate private key input length'
+        );
+        assert.strictEqual(
+            indexHtml.includes('pubKeyBytes must be 133 bytes'),
+            true,
+            'buildPKCS8WithPublicKey must validate public key input length'
         );
     });
 });
