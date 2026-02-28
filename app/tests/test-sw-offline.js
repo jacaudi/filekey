@@ -73,4 +73,24 @@ describe('Service worker structure (Issue #4)', () => {
         assert.ok(swJs.includes('clients.claim()'),
             'activate handler must call clients.claim()');
     });
+
+    it('guards cache.put with networkResponse.ok check', () => {
+        assert.ok(swJs.includes('networkResponse.ok'),
+            'fetch handler must check networkResponse.ok before caching');
+    });
+
+    it('logs errors in catch handler', () => {
+        assert.ok(swJs.includes('console.error'),
+            'catch handler must log errors, not silently discard them');
+    });
+
+    it('offline HTML includes viewport meta tag', () => {
+        assert.ok(swJs.includes('viewport'),
+            'offline HTML must include viewport meta for mobile rendering');
+    });
+
+    it('503 response includes Content-Type header', () => {
+        assert.ok(swJs.includes("'Content-Type': 'text/plain'"),
+            '503 offline response must include Content-Type header');
+    });
 });
