@@ -69,11 +69,16 @@ describe('PKCS#8 unified builder (Issue #3)', () => {
         );
     });
 
-    it('contains round-trip verification logic', () => {
+    it('contains import error handling (not byte-equality round-trip)', () => {
         assert.strictEqual(
             indexHtml.includes('round-trip verification failed'),
+            false,
+            'Byte-equality round-trip must be removed (browsers normalize PKCS#8 exports)'
+        );
+        assert.strictEqual(
+            indexHtml.includes('PKCS#8 import failed:'),
             true,
-            'Must include round-trip verification after PKCS#8 import'
+            'Must have error handling for PKCS#8 import failure'
         );
     });
 });
