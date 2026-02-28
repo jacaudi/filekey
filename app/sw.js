@@ -32,16 +32,21 @@ self.addEventListener('fetch', event => {
             .then(cachedResponse => {
                 if (cachedResponse) return cachedResponse;
                 return fetch(event.request).then(networkResponse => {
-                    return caches.open(CACHE_NAME).then(cache => {
-                        cache.put(event.request, networkResponse.clone());
-                        return networkResponse;
-                    });
+                    if (networkResponse && networkResponse.ok) {
+                        const responseClone = networkResponse.clone();
+                        caches.open(CACHE_NAME).then(cache => {
+                            cache.put(event.request, responseClone);
+                        });
+                    }
+                    return networkResponse;
                 });
             })
-            .catch(() => {
+            .catch((err) => {
+                console.error('[SW] fetch failed:', err);
                 if (event.request.mode === 'navigate') {
                     return new Response(
                         '<!DOCTYPE html><html><head><meta charset="utf-8">' +
+                        '<meta name="viewport" content="width=device-width, initial-scale=1">' +
                         '<title>FileKey - Offline</title></head>' +
                         '<body style="font-family:sans-serif;text-align:center;padding:2em">' +
                         '<h1>You are offline</h1>' +
@@ -51,7 +56,8 @@ self.addEventListener('fetch', event => {
                     );
                 }
                 return new Response('Offline',
-                    { status: 503, statusText: 'Service Unavailable' });
+                    { status: 503, statusText: 'Service Unavailable',
+                      headers: { 'Content-Type': 'text/plain' } });
             })
     );
 });
