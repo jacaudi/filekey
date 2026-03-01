@@ -1,7 +1,5 @@
 # Self-Hosting FileKey
 
-Pre-built multi-arch images (`linux/amd64`, `linux/arm64`) are published to GHCR on every release. No building required.
-
 ---
 
 ## Prerequisites
@@ -12,14 +10,32 @@ Pre-built multi-arch images (`linux/amd64`, `linux/arm64`) are published to GHCR
 
 ---
 
-## Step 1: Deploy with Docker Compose
+## Note on Container Images
 
-Create a `docker-compose.yml`:
+A `docker-build.yml` workflow exists in this repo, but pre-built GHCR images are not currently published. This is because semantic-release pushes version tags using `GITHUB_TOKEN`, and GitHub does not allow that token to trigger downstream workflows — so the Docker Build workflow never fires.
+
+Until this is resolved, deploy by building the image locally from source.
+
+---
+
+## Step 1: Build the Image
+
+```bash
+git clone https://github.com/jacaudi/filekey.git
+cd filekey
+docker build -t filekey:latest .
+```
+
+---
+
+## Step 2: Deploy with Docker Compose
+
+Create a `docker-compose.yml` in the cloned directory:
 
 ```yaml
 services:
   filekey:
-    image: ghcr.io/jacaudi/filekey:latest
+    image: filekey:latest
     container_name: filekey
     ports:
       - "8080:8080"
@@ -32,11 +48,11 @@ Then start it:
 docker compose up -d
 ```
 
-FileKey is now running at `http://localhost:8080`. To pin a specific version, replace `latest` with a release tag (e.g. `v0.3.0`).
+FileKey is now running at `http://localhost:8080`.
 
 ---
 
-## Step 2: Add a Proxy Host in Nginx Proxy Manager
+## Step 3: Add a Proxy Host in Nginx Proxy Manager
 
 1. Go to **Proxy Hosts** → **Add Proxy Host**
 2. Fill in:
@@ -54,16 +70,10 @@ FileKey is now running at `http://localhost:8080`. To pin a specific version, re
 
 ---
 
-## Step 3: Access the App
+## Step 4: Access the App
 
 ```
 https://filekey.example.com
 ```
 
 Or directly without a proxy: `http://<your-server-ip>:8080`
-
----
-
-## Portainer
-
-Paste the `docker-compose.yml` above into **Portainer → Stacks → Add Stack** and deploy from there.
