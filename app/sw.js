@@ -1,8 +1,6 @@
 const CACHE_NAME = 'v1';
 const PRECACHE_URLS = ['/', '/manifest.json', '/logo.svg'];
 
-let change_variable = "h";
-
 self.addEventListener('install', event => {
     event.waitUntil(
         caches.open(CACHE_NAME)
@@ -62,14 +60,3 @@ self.addEventListener('fetch', event => {
     );
 });
 
-self.addEventListener('message', messageReceiver);
-
-function messageReceiver(msg) {
-    if (msg.ports) {
-        switch (msg.data.type) {
-        case "check_change_variable":
-            msg.ports[0].postMessage({ change_variable });
-            break;
-        }
-    }
-}
