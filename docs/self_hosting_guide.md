@@ -14,7 +14,7 @@ A big thank you to Wintech147 for putting this guide together!
 
 This guide walks you through how to:
 
-1. Clone the [FileKey](https://github.com/RockwellShah/filekey) repo
+1. Clone the [FileKey](https://github.com/jacaudi/filekey) repo
 2. Add required PWA icons (optional)
 3. Create a `Dockerfile` to serve it with Nginx
 4. Build and push a Docker image to Docker Hub
@@ -28,12 +28,13 @@ This guide walks you through how to:
 filekey/
 ├── Dockerfile
 ├── docker-compose.yml
-├── index.html
-├── manifest.json
-├── sw.js
-└── icons/ (optional)
-    ├── icon-192.png
-    └── icon-512.png
+├── app/
+│   ├── index.html
+│   ├── manifest.json
+│   ├── sw.js
+│   └── logo.svg
+└── server/
+    └── main.go
 ```
 
 ---
@@ -41,35 +42,29 @@ filekey/
 ## 🛠️ Step 1: Clone the GitHub Repository
 
 ```bash
-git clone https://github.com/RockwellShah/filekey.git
+git clone https://github.com/jacaudi/filekey.git
 cd filekey
 ```
 
 ---
 
-## 🎨 Step 2: Add PWA Icons (Optional)
+## 🎨 Step 2: PWA Icons
 
-Since the original repo doesn't include actual icons, create your own:
+The repo already includes `logo.svg`, which is used as the app icon. No additional icon setup is required for a basic deployment — `manifest.json` references it directly with `"sizes": "any"`.
 
-1. Create icons in your favorit app. For PWAs they are best in .png.
+If you want broader platform compatibility (e.g. older Android versions), you can optionally add rasterized PNG icons:
 
-2. Update `manifest.json` withe icon name and location based on the structure from above:
+1. Export `logo.svg` as `icon-192.png` and `icon-512.png`.
+
+2. Add them to `app/` and update `manifest.json`:
 
    ```json
    "icons": [
-     {
-       "src": "/icons/icon-192.png",
-       "type": "image/png",
-       "sizes": "192x192"
-     },
-     {
-       "src": "/icons/icon-512.png",
-       "type": "image/png",
-       "sizes": "512x512"
-     }
+     { "src": "/logo.svg", "type": "image/svg+xml", "sizes": "any" },
+     { "src": "/icon-192.png", "type": "image/png", "sizes": "192x192" },
+     { "src": "/icon-512.png", "type": "image/png", "sizes": "512x512" }
    ]
    ```
-(Editor's note: there is now an SVG version of the FileKey icon in the repo.)
 
 ---
 
