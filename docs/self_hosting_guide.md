@@ -10,32 +10,24 @@
 
 ---
 
-## Note on Container Images
+## Step 1: Pull the Image
 
-A `docker-build.yml` workflow exists in this repo, but pre-built GHCR images are not currently published. This is because semantic-release pushes version tags using `GITHUB_TOKEN`, and GitHub does not allow that token to trigger downstream workflows — so the Docker Build workflow never fires.
-
-Until this is resolved, deploy by building the image locally from source.
-
----
-
-## Step 1: Build the Image
+Pre-built multi-arch images are published to the GitHub Container Registry on every release:
 
 ```bash
-git clone https://github.com/jacaudi/filekey.git
-cd filekey
-docker build -t filekey:latest .
+docker pull ghcr.io/jacaudi/filekey:latest
 ```
 
 ---
 
 ## Step 2: Deploy with Docker Compose
 
-Create a `docker-compose.yml` in the cloned directory:
+Create a `docker-compose.yml`:
 
 ```yaml
 services:
   filekey:
-    image: filekey:latest
+    image: ghcr.io/jacaudi/filekey:latest
     container_name: filekey
     ports:
       - "8080:8080"
