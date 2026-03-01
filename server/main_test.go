@@ -4,6 +4,7 @@ import (
 	"io/fs"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 )
 
@@ -58,6 +59,55 @@ func TestCacheControlHeaders(t *testing.T) {
 				}
 			}
 		})
+	}
+}
+
+func TestSecurityHeaders(t *testing.T) {
+	handler := makeHandler(t)
+
+	secHeaders := map[string]string{
+		"X-Frame-Options":        "DENY",
+		"X-Content-Type-Options": "nosniff",
+		"Referrer-Policy":        "strict-origin-when-cross-origin",
+		"Permissions-Policy":     "camera=(), microphone=(), geolocation=()",
+	}
+
+	for _, path := range []string{"/", "/sw.js", "/manifest.json", "/logo.svg"} {
+		t.Run(path, func(t *testing.T) {
+			req := httptest.NewRequest(http.MethodGet, path, nil)
+			w := httptest.NewRecorder()
+			handler.ServeHTTP(w, req)
+
+			for header, want := range secHeaders {
+				if got := w.Header().Get(header); got != want {
+					t.Errorf("%s: got %q, want %q", header, got, want)
+				}
+			}
+		})
+	}
+}
+
+func TestCSPHeader(t *testing.T) {
+	handler := makeHandler(t)
+
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	w := httptest.NewRecorder()
+	handler.ServeHTTP(w, req)
+
+	csp := w.Header().Get("Content-Security-Policy")
+	if csp == "" {
+		t.Fatal("Content-Security-Policy header missing")
+	}
+
+	for _, directive := range []string{
+		"default-src 'self'",
+		"script-src 'self' 'unsafe-inline'",
+		"style-src 'self' 'unsafe-inline'",
+		"worker-src blob:",
+	} {
+		if !strings.Contains(csp, directive) {
+			t.Errorf("CSP missing directive: %s", directive)
+		}
 	}
 }
 
