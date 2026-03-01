@@ -49,7 +49,7 @@ Pre-built multi-arch images are published to the GitHub Container Registry on ev
 docker run -p 8080:8080 ghcr.io/jacaudi/filekey:latest
 ```
 
-See the [self-hosting guide](docs/self_hosting_guide.md) for Nginx Proxy Manager, SSL, and Portainer setup.
+See the [self-hosting guide](docs/self_hosting_guide.md) for Nginx Proxy Manager and SSL setup.
 
 ---
 
