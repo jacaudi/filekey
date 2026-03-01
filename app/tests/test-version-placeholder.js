@@ -1,8 +1,9 @@
 const { describe, it } = require('node:test');
 const assert = require('node:assert');
 const fs = require('node:fs');
-const indexHtml = fs.readFileSync('/app/index.html', 'utf8');
-const swJs = fs.readFileSync('/app/sw.js', 'utf8');
+const path = require('node:path');
+const indexHtml = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
+const swJs = fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8');
 
 describe('Version placeholder (Issue #10)', () => {
     it('index.html contains __APP_VERSION__ placeholder', () => {
