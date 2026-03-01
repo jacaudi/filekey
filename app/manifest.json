@@ -1,21 +1,22 @@
 {
     "short_name": "FileKey",
     "name": "FileKey",
+    "description": "Encrypt and share files securely with passkeys. Fully offline, easy-to-use, and zero-knowledge for ultimate file protection.",
+    "categories": ["utilities", "security"],
+    "lang": "en",
+    "dir": "ltr",
+    "orientation": "any",
     "icons": [
         {
             "src": "/logo.svg",
             "type": "image/svg+xml",
-            "sizes": "128x128"
+            "sizes": "any"
         },
         {
             "src": "/logo.svg",
             "type": "image/svg+xml",
-            "sizes": "256x256"
-        },
-        {
-            "src": "/logo.svg",
-            "type": "image/svg+xml",
-            "sizes": "512x512"
+            "sizes": "any",
+            "purpose": "maskable"
         }
     ],
     "background_color": "#fff",
