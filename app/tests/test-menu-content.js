@@ -1,7 +1,8 @@
 const { describe, it } = require('node:test');
 const assert = require('node:assert');
 const fs = require('node:fs');
-const indexHtml = fs.readFileSync('/app/index.html', 'utf8');
+const path = require('node:path');
+const indexHtml = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
 
 describe('Menu content cleanup (Issues #7, #8)', () => {
     it('has no reference to /source.txt', () => {
