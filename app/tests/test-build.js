@@ -1,6 +1,7 @@
 const { describe, it } = require('node:test');
 const assert = require('node:assert');
 const fs = require('node:fs');
+const os = require('node:os');
 const path = require('node:path');
 const { execSync } = require('node:child_process');
 
@@ -40,11 +41,16 @@ describe('Build system (Issue #27)', () => {
     });
 
     it('build script produces valid output', { skip: !hasFullRepo && 'requires full repo access' }, () => {
-        // Save current output, rebuild, compare
-        const before = fs.readFileSync(outputFile, 'utf8');
-        execSync('node scripts/build.js', { cwd: repoRoot });
-        const after = fs.readFileSync(outputFile, 'utf8');
-        assert.strictEqual(after, before, 'Build output must match committed file');
+        // Build to a temp file — avoids mutating the committed app/index.html
+        const tmp = path.join(os.tmpdir(), `index-build-test-${process.pid}.html`);
+        try {
+            execSync(`node scripts/build.js ${tmp}`, { cwd: repoRoot });
+            const built = fs.readFileSync(tmp, 'utf8');
+            const committed = fs.readFileSync(outputFile, 'utf8');
+            assert.strictEqual(built, committed, 'Build output must match committed file');
+        } finally {
+            if (fs.existsSync(tmp)) fs.unlinkSync(tmp);
+        }
     });
 
     it('worker files contain expected classes', { skip: !hasFullRepo && 'requires full repo access' }, () => {

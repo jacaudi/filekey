@@ -1,3 +1,6 @@
+// Worker entry point. Build order in scripts/build.js matters:
+// this file is concatenated first; ww_encryption_handler, buffer_helper,
+// keccak_handler, and determineEcdh are defined in the files that follow.
 self.addEventListener("message", handleMessage);
 let eh=new ww_encryption_handler();
 let active_mp_buff=null;
@@ -147,7 +150,6 @@ cb(seed);
 }
 function seedToHkdf(seed, cb){
 buffToHkdf(seed, function(ret){
-var qq=222;
 cb(ret);
 }
 );

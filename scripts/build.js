@@ -6,7 +6,7 @@ const path = require('node:path');
 
 const ROOT = path.join(__dirname, '..');
 const SRC = path.join(ROOT, 'src');
-const OUTPUT = path.join(ROOT, 'app', 'index.html');
+const OUTPUT = process.argv[2] || path.join(ROOT, 'app', 'index.html');
 
 // Read source files
 const template = fs.readFileSync(path.join(SRC, 'index.html.tmpl'), 'utf8');
@@ -40,4 +40,5 @@ output = output.replace('{{SCRIPT}}', indent(fullScript, 12));
 
 // Write output
 fs.writeFileSync(OUTPUT, output);
-console.log('Built: app/index.html (%d bytes)', Buffer.byteLength(output));
+const label = path.relative(ROOT, OUTPUT);
+console.log('Built: %s (%d bytes)', label, Buffer.byteLength(output));
