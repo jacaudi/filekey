@@ -14,6 +14,11 @@ func makeHandler(t *testing.T) http.Handler {
 	if err != nil {
 		t.Fatalf("failed to create sub FS: %v", err)
 	}
+	indexBytes, err := fs.ReadFile(appFS, "index.html")
+	if err != nil {
+		t.Fatalf("failed to read embedded index.html: %v", err)
+	}
+	indexContent := strings.Replace(string(indexBytes), "__APP_VERSION__", Version, 1)
 	fileServer := http.FileServer(http.FS(appFS))
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("X-Frame-Options", "DENY")
@@ -34,13 +39,38 @@ func makeHandler(t *testing.T) http.Handler {
 		case "/sw.js":
 			w.Header().Set("Cache-Control", "no-store")
 			w.Header().Set("Service-Worker-Allowed", "/")
-		case "/", "/index.html", "/manifest.json":
+		case "/", "/index.html":
+			w.Header().Set("Cache-Control", "no-cache")
+			w.Header().Set("Content-Type", "text/html; charset=utf-8")
+			w.Write([]byte(indexContent))
+			return
+		case "/manifest.json":
 			w.Header().Set("Cache-Control", "no-cache")
 		default:
 			w.Header().Set("Cache-Control", "public, max-age=31536000, immutable")
 		}
 		fileServer.ServeHTTP(w, r)
 	})
+}
+
+func TestVersionInjection(t *testing.T) {
+	raw, err := staticFiles.ReadFile("app/index.html")
+	if err != nil {
+		t.Fatalf("failed to read embedded index.html: %v", err)
+	}
+	if !strings.Contains(string(raw), "__APP_VERSION__") {
+		t.Fatal("embedded index.html must contain __APP_VERSION__ placeholder")
+	}
+
+	handler := makeHandler(t)
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	w := httptest.NewRecorder()
+	handler.ServeHTTP(w, req)
+
+	body := w.Body.String()
+	if strings.Contains(body, "__APP_VERSION__") {
+		t.Error("served response must not contain raw __APP_VERSION__ placeholder")
+	}
 }
 
 func TestCacheControlHeaders(t *testing.T) {

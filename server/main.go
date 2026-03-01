@@ -8,10 +8,14 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 )
 
 //go:embed app
 var staticFiles embed.FS
+
+// Version is set at build time via -ldflags="-X main.Version=<tag>"
+var Version = "dev"
 
 func main() {
 	port := flag.Int("port", 8080, "port to listen on")
@@ -25,6 +29,12 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to create sub FS: %v", err)
 	}
+
+	indexBytes, err := fs.ReadFile(appFS, "index.html")
+	if err != nil {
+		log.Fatalf("failed to read embedded index.html: %v", err)
+	}
+	indexContent := strings.Replace(string(indexBytes), "__APP_VERSION__", Version, 1)
 
 	fileServer := http.FileServer(http.FS(appFS))
 
@@ -48,7 +58,12 @@ func main() {
 			// Service workers must always be revalidated by the browser
 			w.Header().Set("Cache-Control", "no-store")
 			w.Header().Set("Service-Worker-Allowed", "/")
-		case "/", "/index.html", "/manifest.json":
+		case "/", "/index.html":
+			w.Header().Set("Cache-Control", "no-cache")
+			w.Header().Set("Content-Type", "text/html; charset=utf-8")
+			w.Write([]byte(indexContent))
+			return
+		case "/manifest.json":
 			w.Header().Set("Cache-Control", "no-cache")
 		default:
 			w.Header().Set("Cache-Control", "public, max-age=31536000, immutable")
