@@ -7,7 +7,7 @@ RUN apk add --no-cache curl unzip && \
     curl -fsSL "https://github.com/rsms/inter/releases/download/v4.0/Inter-4.0.zip" \
          -o /tmp/inter.zip && \
     unzip /tmp/inter.zip -d /tmp/inter && \
-    find /tmp/inter -name "Inter-V.ttf" -exec cp {} /inter_variable.ttf \;
+    find /tmp/inter -name "InterVariable.ttf" -exec cp {} /inter_variable.ttf \;
 
 # =============================================================
 # Stage 2 — Compile the Go static-file server with embedded app
