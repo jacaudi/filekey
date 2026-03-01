@@ -1,201 +1,69 @@
-# 🐳 Self-Hosting FileKey as a Dockerized PWA
-A big thank you to Wintech147 for putting this guide together!
+# Self-Hosting FileKey
+
+Pre-built multi-arch images (`linux/amd64`, `linux/arm64`) are published to GHCR on every release. No building required.
 
 ---
 
-## ✅ Prerequisites
+## Prerequisites
 
-- Docker already installed both on your build machine and on a docker host
-- Nginx Proxy Manager is installed and accessible with LetsEncrypt configured
-- You own a domain (e.g., `filekey.example.com`)
-- You have DNS configured whether internally or externally that points to your proxy for traffic
-
----
-
-This guide walks you through how to:
-
-1. Clone the [FileKey](https://github.com/jacaudi/filekey) repo
-2. Add required PWA icons (optional)
-3. Create a `Dockerfile` to serve it with Nginx
-4. Build and push a Docker image to Docker Hub
-5. Deploy it using Docker Compose
+- Docker and Docker Compose installed on your host
+- A domain pointed at your host (e.g. `filekey.example.com`)
+- Nginx Proxy Manager (or similar reverse proxy) with Let's Encrypt configured
 
 ---
 
-## 📁 Project Structure
+## Step 1: Deploy with Docker Compose
 
-```
-filekey/
-├── Dockerfile
-├── docker-compose.yml
-├── app/
-│   ├── index.html
-│   ├── manifest.json
-│   ├── sw.js
-│   └── logo.svg
-└── server/
-    └── main.go
-```
-
----
-
-## 🛠️ Step 1: Clone the GitHub Repository
-
-```bash
-git clone https://github.com/jacaudi/filekey.git
-cd filekey
-```
-
----
-
-## 🎨 Step 2: PWA Icons
-
-The repo already includes `logo.svg`, which is used as the app icon. No additional icon setup is required for a basic deployment — `manifest.json` references it directly with `"sizes": "any"`.
-
-If you want broader platform compatibility (e.g. older Android versions), you can optionally add rasterized PNG icons:
-
-1. Export `logo.svg` as `icon-192.png` and `icon-512.png`.
-
-2. Add them to `app/` and update `manifest.json`:
-
-   ```json
-   "icons": [
-     { "src": "/logo.svg", "type": "image/svg+xml", "sizes": "any" },
-     { "src": "/icon-192.png", "type": "image/png", "sizes": "192x192" },
-     { "src": "/icon-512.png", "type": "image/png", "sizes": "512x512" }
-   ]
-   ```
-
----
-
-## 🐳 Step 3: Create Dockerfile
-
-In the root of the cloned repo, create a file named `Dockerfile` and paste the below into it:
-
-```dockerfile
-FROM nginx:alpine
-
-# Remove default Nginx page
-RUN rm -rf /usr/share/nginx/html/*
-
-# Copy static site into Nginx root
-COPY . /usr/share/nginx/html
-
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
-```
-
----
-
-## 🔨 Step 4: Build and Push Docker Image to Docker Hub
-
-This assumes you have Docker installed on your local dev machine. This is not where you will be running the container just building the container image.
-
-1. Build the image and don't leave out that trailing period: 
-   ```bash
-   docker build -t <your-dockerhub-username>/filekey:filekeyv1 .
-   ```
-
-Now you can choose to copy the image to your local docker host that you want the containers to run on and do docker run with the local image. I prefer to keep my images stored in Docker Hub to allow for easy pulls onto various hosts I run which is what I'm showing below:
-
-2. Log in to Docker Hub:
-   ```bash
-   docker login
-   ```
-
-3. Push the image:
-   ```bash
-   docker push <your-dockerhub-username>/filekey:latest
-   ```
-
-> Replace `<your-dockerhub-username>` with your actual Docker Hub username. Use any tag you wish instead of 'latest'
-
----
-
-## 🚀 Step 5: Deploy Using Docker Compose
-
-Create a `docker-compose.yml` file:
+Create a `docker-compose.yml`:
 
 ```yaml
-version: '3.8'
-
 services:
   filekey:
-    image: <your-dockerhub-username>/filekey:filekeyv1
+    image: ghcr.io/jacaudi/filekey:latest
     container_name: filekey
     ports:
-      - "8080:80"
+      - "8080:8080"
     restart: unless-stopped
 ```
 
-Choose any port that is open on your docker host in my case it was 8080 but this can be anything.
-
-Deploy with:
+Then start it:
 
 ```bash
 docker compose up -d
 ```
 
-Or paste into **Portainer > Stacks > Add Stack**.
+FileKey is now running at `http://localhost:8080`. To pin a specific version, replace `latest` with a release tag (e.g. `v0.3.0`).
 
 ---
 
-## 🔐 Step 6: Add to NGINX Proxy Manager (or something similiar)
+## Step 2: Add a Proxy Host in Nginx Proxy Manager
 
-### ➕ Add New Proxy Host
+1. Go to **Proxy Hosts** → **Add Proxy Host**
+2. Fill in:
 
-- Go to your NGNIX Proxy Manager
-- Go to **"Proxy Hosts"**
-- Click **"Add Proxy Host"**
+| Field | Value |
+|-------|-------|
+| Domain Names | `filekey.example.com` |
+| Scheme | `http` |
+| Forward Hostname / IP | your Docker host IP, or `localhost` if co-located |
+| Forward Port | `8080` |
+| Block Common Exploits | ✅ Recommended |
 
-#### Fill in the following:
-
-| Field              | Value                               |
-|-------------------|-------------------------------------|
-| **Domain Names**  | `filekey.example.com`               |
-| **Scheme**        | `http`                              |
-| **Forward Hostname / IP** | `your-docker-host-ip` or `localhost`if on the same host |
-| **Forward Port**  | `8080` (or whatever FileKey is running on) |
-| **Cache Assets**  | Optional          |
-| **Block Common Exploits** | ✅ Recommended               |
-| **Websockets Support** | ✅ Recommended                   |
+3. On the **SSL** tab: enable SSL, Force SSL, HTTP/2, and HSTS. Choose your Let's Encrypt cert.
+4. Click **Save**.
 
 ---
 
-### 🔒 Enable SSL (Let's Encrypt)
-
-- Go to the **SSL** tab
-- Check **“Enable SSL”**
-- Check **“Force SSL”**
-- Check **“HTTP/2 Support”**
-- Check **“HSTS Enabled”**
-- Choose **Choose your cert**
-
-Click **Save**.
-
----
-
-## 🌐 Step 7: Access the App
-
-Once deployed and added to your proxy, visit:
+## Step 3: Access the App
 
 ```
 https://filekey.example.com
-
-http://<your-server-ip>:8080 (if not using a proxy)
 ```
 
----
-
-## ✅ Summary
-
-| Step                        | Description                               |
-|-----------------------------|-------------------------------------------|
-| Clone & customize           | Pull the repo, add icons, edit manifest and index.html   |
-| Build image                 | `docker build -t yourname/filekey:tag .` |
-| Push to Docker Hub          | `docker push yourname/filekey:tag`       |
-| Deploy with Compose/Portainer | Map port 8080, restart unless stopped   |
-| Add proxy host to NGINX Proxy Manager | docker host, port 8080, SSL   |
-| PWA Ready                   | Installable with custom icon & manifest  |
+Or directly without a proxy: `http://<your-server-ip>:8080`
 
 ---
+
+## Portainer
+
+Paste the `docker-compose.yml` above into **Portainer → Stacks → Add Stack** and deploy from there.
