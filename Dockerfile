@@ -23,8 +23,9 @@ COPY server/main.go ./
 COPY app/ ./app/
 COPY --from=fonts /inter_variable.ttf ./app/fonts/inter_variable.ttf
 
+ARG APP_VERSION=dev
 RUN CGO_ENABLED=0 GOOS=linux go build \
-    -ldflags="-s -w" \
+    -ldflags="-s -w -X main.Version=${APP_VERSION}" \
     -trimpath \
     -o /filekey \
     .
