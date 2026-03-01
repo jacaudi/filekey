@@ -33,7 +33,7 @@ func makeHandler(t *testing.T) http.Handler {
 				"font-src 'self'; "+
 				"connect-src 'self'; "+
 				"manifest-src 'self'; "+
-				"worker-src blob:")
+				"worker-src 'self' blob:")
 
 		switch r.URL.Path {
 		case "/sw.js":
@@ -147,7 +147,7 @@ func TestCSPHeader(t *testing.T) {
 		"default-src 'self'",
 		"script-src 'self' 'unsafe-inline'",
 		"style-src 'self' 'unsafe-inline'",
-		"worker-src blob:",
+		"worker-src 'self' blob:",
 	} {
 		if !strings.Contains(csp, directive) {
 			t.Errorf("CSP missing directive: %s", directive)

@@ -51,7 +51,7 @@ func main() {
 				"font-src 'self'; "+
 				"connect-src 'self'; "+
 				"manifest-src 'self'; "+
-				"worker-src blob:")
+				"worker-src 'self' blob:")
 
 		switch r.URL.Path {
 		case "/sw.js":
