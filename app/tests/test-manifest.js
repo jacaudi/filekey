@@ -1,7 +1,8 @@
 const { describe, it } = require('node:test');
 const assert = require('node:assert');
 const fs = require('node:fs');
-const manifest = JSON.parse(fs.readFileSync('/app/manifest.json', 'utf8'));
+const path = require('node:path');
+const manifest = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'manifest.json'), 'utf8'));
 
 describe('manifest.json (Issue #12)', () => {
     it('is valid JSON with required fields', () => {
