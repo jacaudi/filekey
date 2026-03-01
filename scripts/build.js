@@ -1,0 +1,43 @@
+#!/usr/bin/env node
+'use strict';
+
+const fs = require('node:fs');
+const path = require('node:path');
+
+const ROOT = path.join(__dirname, '..');
+const SRC = path.join(ROOT, 'src');
+const OUTPUT = path.join(ROOT, 'app', 'index.html');
+
+// Read source files
+const template = fs.readFileSync(path.join(SRC, 'index.html.tmpl'), 'utf8');
+const css = fs.readFileSync(path.join(SRC, 'css', 'styles.css'), 'utf8');
+const mainJs = fs.readFileSync(path.join(SRC, 'js', 'main.js'), 'utf8');
+
+// Read worker source files in correct order
+const WORKER_FILES = ['index.js', 'encryption.js', 'buffer.js', 'keccak.js', 'ecdh.js'];
+const workerParts = WORKER_FILES.map(f =>
+    fs.readFileSync(path.join(SRC, 'js', 'worker', f), 'utf8')
+);
+
+// Minify worker: collapse all whitespace to single spaces
+const workerBlob = workerParts.join(' ').replace(/\s+/g, ' ').trim();
+
+// Indent helper: add prefix to each non-empty line
+function indent(text, spaces) {
+    const prefix = ' '.repeat(spaces);
+    return text.split('\n')
+        .map(line => line.length > 0 ? prefix + line : line)
+        .join('\n');
+}
+
+// Assemble: CSS
+let output = template.replace('{{CSS}}', indent(css.trimEnd(), 12));
+
+// Assemble: JS = main.js + worker blob assignment
+const workerLine = 'let ww_js_script = ` ' + workerBlob + ' `;';
+const fullScript = mainJs.trimEnd() + '\n' + workerLine;
+output = output.replace('{{SCRIPT}}', indent(fullScript, 12));
+
+// Write output
+fs.writeFileSync(OUTPUT, output);
+console.log('Built: app/index.html (%d bytes)', Buffer.byteLength(output));
