@@ -789,7 +789,8 @@
                 initDB();
                 registerBasicSw();
                 var domain_id = window.location.hostname;
-                if (domain_id != "localhost") {
+                var is_ip = /^[\d.]+$/.test(domain_id) || domain_id.includes(':');
+                if (domain_id != "localhost" && !is_ip) {
                     var parts = domain_id.split('.');
                     domain_id = (parts.length > 2) ? parts.slice(-2).join('.') : domain_id;
                 }
