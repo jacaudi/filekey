@@ -14,6 +14,14 @@ const outputFile = path.join(__dirname, '..', 'index.html');
 // Check for scripts/ directory (exists after Task 1 extraction, but before Task 3 build.js).
 const hasFullRepo = fs.existsSync(path.join(repoRoot, 'scripts'));
 
+// Main-thread source files in dependency order (matches MAIN_FILES in scripts/build.js)
+const MAIN_FILES = [
+    'lib/debug.js', 'lib/utils.js', 'lib/buffer.js', 'lib/keccak.js',
+    'lib/crypto-storage.js', 'lib/webauthn.js', 'lib/workers.js',
+    'ui/renderer.js', 'ui/file-ops.js', 'ui/file-import.js', 'ui/menu.js',
+    'app/db-handler.js', 'app/crypto-ops.js', 'app/init.js',
+];
+
 describe('Build system (Issue #27)', () => {
     it('build script exists', { skip: !hasFullRepo && 'requires full repo access' }, () => {
         assert.ok(fs.existsSync(buildScript), 'scripts/build.js must exist');
@@ -29,26 +37,14 @@ describe('Build system (Issue #27)', () => {
     });
 
     it('all main source files exist', { skip: !hasFullRepo && 'requires full repo access' }, () => {
-        const mainFiles = [
-            'lib/debug.js', 'lib/utils.js', 'lib/buffer.js', 'lib/keccak.js',
-            'lib/crypto-storage.js', 'lib/webauthn.js', 'lib/workers.js',
-            'ui/renderer.js', 'ui/file-ops.js', 'ui/file-import.js', 'ui/menu.js',
-            'app/db-handler.js', 'app/crypto-ops.js', 'app/init.js',
-        ];
-        for (const f of mainFiles) {
+        for (const f of MAIN_FILES) {
             assert.ok(fs.existsSync(path.join(srcDir, 'js', f)),
                 `src/js/${f} must exist`);
         }
     });
 
     it('no main source file exceeds 600 lines', { skip: !hasFullRepo && 'requires full repo access' }, () => {
-        const mainFiles = [
-            'lib/debug.js', 'lib/utils.js', 'lib/buffer.js', 'lib/keccak.js',
-            'lib/crypto-storage.js', 'lib/webauthn.js', 'lib/workers.js',
-            'ui/renderer.js', 'ui/file-ops.js', 'ui/file-import.js', 'ui/menu.js',
-            'app/db-handler.js', 'app/crypto-ops.js', 'app/init.js',
-        ];
-        for (const f of mainFiles) {
+        for (const f of MAIN_FILES) {
             const content = fs.readFileSync(path.join(srcDir, 'js', f), 'utf8');
             const lineCount = content.split('\n').length;
             assert.ok(lineCount <= 600,
