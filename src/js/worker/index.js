@@ -126,11 +126,11 @@ function genDetEcdh(seed){
 var ret1=det_ecdh_h.generateKeyPair(seed);
 det_ecdh_h.convertKeys(ret1.privateKey, ret1.publicKey, function(result){
 if(!result.privateKey.success){
-console.error("ECDH key setup failed:", result.privateKey.error);
+fk_log('error', 'crypto', 'ECDH key setup failed: ' + result.privateKey.error);
 return;
 }
 if(!result.publicKey.success){
-console.error("ECDH public key setup failed:", result.publicKey.error);
+fk_log('error', 'crypto', 'ECDH public key setup failed: ' + result.publicKey.error);
 return;
 }
 active_det_ecdh_pub_buff=result.publicKey.rawBuffer;
