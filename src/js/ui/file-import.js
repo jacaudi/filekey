@@ -93,7 +93,7 @@ function setFileImport() {
         function highlight(e) {
             preventDefaults(e);
             if (active_border_animation === false) {
-                console.log("new highlight");
+                fk_log('debug', 'file', 'drag highlight');
                 active_border_animation = true;
                 drop_border_obj.toggleAnimation(true);
             }
@@ -101,7 +101,7 @@ function setFileImport() {
         function unhighlight(e) {
             drop_border_obj.toggleAnimation(false);
             active_border_animation = false;
-            console.log("active_border_animation back to false");
+            fk_log('debug', 'file', 'drag unhighlight');
         }
         function handleDropAnimation(e) {
             preventDefaults(e);
@@ -141,7 +141,7 @@ function setFileImport() {
             }
         }
         , (error) => {
-            console.error('Error reading directory:', error);
+            fk_log('error', 'file', 'error reading directory', error);
         }
         );
     }

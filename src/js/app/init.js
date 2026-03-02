@@ -99,7 +99,7 @@ function setVersionNumber() {
 function sendSwMessage(data, cb) {
     var msg_channel = new MessageChannel();
     if (swc == null) {
-        console.log("no sw yet");
+        fk_log('warn', 'sw', 'service worker not available');
         return;
     }
     if (swc.state === 'activated') {
@@ -109,16 +109,16 @@ function sendSwMessage(data, cb) {
         swc = navigator.serviceWorker.controller;
         sendSwMessage(data, cb);
     } else
-        console.log(swc.state);
+        fk_log('debug', 'sw', 'service worker state', swc.state);
 }
 function memTest() {
     if (performance.memory) {
         const memoryInfo = performance.memory;
-        console.log('JS Heap used: ' + memoryInfo.usedJSHeapSize);
-        console.log('JS Heap total: ' + memoryInfo.totalJSHeapSize);
-        console.log('JS Heap limit: ' + memoryInfo.jsHeapSizeLimit);
+        fk_log('debug', 'init', 'JS Heap used', memoryInfo.usedJSHeapSize);
+        fk_log('debug', 'init', 'JS Heap total', memoryInfo.totalJSHeapSize);
+        fk_log('debug', 'init', 'JS Heap limit', memoryInfo.jsHeapSizeLimit);
     } else
-        console.log('Memory info is not available in this browser.');
+        fk_log('debug', 'init', 'memory info not available');
 }
 function initLogo() {
     var logo_bar = document.getElementById("logo_bar");
@@ -154,7 +154,7 @@ function registerBasicSw() {
     if ('serviceWorker'in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('/sw.js').then( (registration) => {
-                console.log('Service Worker registered with scope:', registration.scope);
+                fk_log('debug', 'sw', 'registered with scope: ' + registration.scope);
                 swc = navigator.serviceWorker.controller;
                 registration.onupdatefound = () => {
                     const newSW = registration.installing;
@@ -172,7 +172,7 @@ function registerBasicSw() {
                 ;
             }
             ).catch( (error) => {
-                console.log('Service Worker registration failed:', error);
+                fk_log('error', 'sw', 'registration failed', error);
             }
             );
         }

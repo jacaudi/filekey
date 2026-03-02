@@ -18,7 +18,7 @@ function fk_db_handler(cb) {
             else {
                 main_handler.getPersist(function(result) {
                     if (result)
-                        console.log("Persistent storage granted");
+                        fk_log('debug', 'db', 'persistent storage granted');
                     else
                         setPersistentWarning();
                     cb();
@@ -34,7 +34,7 @@ function fk_db_handler(cb) {
         main_handler.clearStore(db_obj.data_store.name);
     }
     function setPersistentWarning() {
-        console.log("Unable to obtain persistent storage, use with caution. Bookmark page to resolve");
+        fk_log('warn', 'db', 'persistent storage unavailable, bookmark page to resolve');
     }
     this.deleteKey = deleteKey;
     function deleteKey(key, cb) {
@@ -90,7 +90,7 @@ function fk_db_handler(cb) {
                     cb();
                 }
             } else
-                console.log("Warning", "Failed to set biometrics for: " + file_id);
+                fk_log('warn', 'db', 'failed to save file: ' + file_id);
         });
     }
     this.cursorDataToFcn = cursorDataToFcn;

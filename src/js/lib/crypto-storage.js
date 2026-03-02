@@ -27,23 +27,23 @@ function database(db_name, stores, version_number, cb) {
     (function openDatabase() {
         var req = window.indexedDB.open(db_name, version_number);
         req.onsuccess = function(event) {
-            console.log("DB Success");
+            fk_log('debug', 'db', 'database opened');
             db = this.result;
             cb(true);
         }
         ;
         req.onerror = function(event) {
-            console.log("Unable to open DB: ", event.target.message);
+            fk_log('error', 'db', 'unable to open database', event.target.message);
             cb(false);
         }
         ;
         req.onblocked = function(event) {
-            console.log("Opening db has been blocked", event.target.message);
+            fk_log('warn', 'db', 'database open blocked', event.target.message);
             cb(false);
         }
         ;
         req.onupgradeneeded = function(event) {
-            console.log("DB Upgraded");
+            fk_log('debug', 'db', 'database upgraded');
             db = event.target.result;
             for (var i = 0; i < stores.length; i++)
                 db.createObjectStore(stores[i].name, stores[i].params);
@@ -201,7 +201,7 @@ function securelyDeleteFromStore(dbHandler, storeNames, callback) {
                             }
                             ;
                             putRequest.onerror = function(err) {
-                                console.error("Error overwriting record:", err);
+                                fk_log('error', 'db', 'error overwriting record', err);
                                 processedRecords++;
                                 if (processedRecords === records.length) {
                                     writeableStore.clear().onsuccess = function() {
@@ -234,7 +234,7 @@ function securelyDeleteFromStore(dbHandler, storeNames, callback) {
         }
         ;
         allRecordsRequest.onerror = function(err) {
-            console.error("Error fetching records for secure deletion:", err);
+            fk_log('error', 'db', 'error fetching records for secure deletion', err);
             completedStores++;
             if (completedStores === storeNames.length && callback) {
                 callback(false);

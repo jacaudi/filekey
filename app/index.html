@@ -1217,23 +1217,23 @@
                 (function openDatabase() {
                     var req = window.indexedDB.open(db_name, version_number);
                     req.onsuccess = function(event) {
-                        console.log("DB Success");
+                        fk_log('debug', 'db', 'database opened');
                         db = this.result;
                         cb(true);
                     }
                     ;
                     req.onerror = function(event) {
-                        console.log("Unable to open DB: ", event.target.message);
+                        fk_log('error', 'db', 'unable to open database', event.target.message);
                         cb(false);
                     }
                     ;
                     req.onblocked = function(event) {
-                        console.log("Opening db has been blocked", event.target.message);
+                        fk_log('warn', 'db', 'database open blocked', event.target.message);
                         cb(false);
                     }
                     ;
                     req.onupgradeneeded = function(event) {
-                        console.log("DB Upgraded");
+                        fk_log('debug', 'db', 'database upgraded');
                         db = event.target.result;
                         for (var i = 0; i < stores.length; i++)
                             db.createObjectStore(stores[i].name, stores[i].params);
@@ -1391,7 +1391,7 @@
                                         }
                                         ;
                                         putRequest.onerror = function(err) {
-                                            console.error("Error overwriting record:", err);
+                                            fk_log('error', 'db', 'error overwriting record', err);
                                             processedRecords++;
                                             if (processedRecords === records.length) {
                                                 writeableStore.clear().onsuccess = function() {
@@ -1424,7 +1424,7 @@
                     }
                     ;
                     allRecordsRequest.onerror = function(err) {
-                        console.error("Error fetching records for secure deletion:", err);
+                        fk_log('error', 'db', 'error fetching records for secure deletion', err);
                         completedStores++;
                         if (completedStores === storeNames.length && callback) {
                             callback(false);
@@ -2678,7 +2678,7 @@
                     function highlight(e) {
                         preventDefaults(e);
                         if (active_border_animation === false) {
-                            console.log("new highlight");
+                            fk_log('debug', 'file', 'drag highlight');
                             active_border_animation = true;
                             drop_border_obj.toggleAnimation(true);
                         }
@@ -2686,7 +2686,7 @@
                     function unhighlight(e) {
                         drop_border_obj.toggleAnimation(false);
                         active_border_animation = false;
-                        console.log("active_border_animation back to false");
+                        fk_log('debug', 'file', 'drag unhighlight');
                     }
                     function handleDropAnimation(e) {
                         preventDefaults(e);
@@ -2726,7 +2726,7 @@
                         }
                     }
                     , (error) => {
-                        console.error('Error reading directory:', error);
+                        fk_log('error', 'file', 'error reading directory', error);
                     }
                     );
                 }
@@ -3040,7 +3040,7 @@
                         else {
                             main_handler.getPersist(function(result) {
                                 if (result)
-                                    console.log("Persistent storage granted");
+                                    fk_log('debug', 'db', 'persistent storage granted');
                                 else
                                     setPersistentWarning();
                                 cb();
@@ -3056,7 +3056,7 @@
                     main_handler.clearStore(db_obj.data_store.name);
                 }
                 function setPersistentWarning() {
-                    console.log("Unable to obtain persistent storage, use with caution. Bookmark page to resolve");
+                    fk_log('warn', 'db', 'persistent storage unavailable, bookmark page to resolve');
                 }
                 this.deleteKey = deleteKey;
                 function deleteKey(key, cb) {
@@ -3112,7 +3112,7 @@
                                 cb();
                             }
                         } else
-                            console.log("Warning", "Failed to set biometrics for: " + file_id);
+                            fk_log('warn', 'db', 'failed to save file: ' + file_id);
                     });
                 }
                 this.cursorDataToFcn = cursorDataToFcn;
@@ -3507,7 +3507,7 @@
             function sendSwMessage(data, cb) {
                 var msg_channel = new MessageChannel();
                 if (swc == null) {
-                    console.log("no sw yet");
+                    fk_log('warn', 'sw', 'service worker not available');
                     return;
                 }
                 if (swc.state === 'activated') {
@@ -3517,16 +3517,16 @@
                     swc = navigator.serviceWorker.controller;
                     sendSwMessage(data, cb);
                 } else
-                    console.log(swc.state);
+                    fk_log('debug', 'sw', 'service worker state', swc.state);
             }
             function memTest() {
                 if (performance.memory) {
                     const memoryInfo = performance.memory;
-                    console.log('JS Heap used: ' + memoryInfo.usedJSHeapSize);
-                    console.log('JS Heap total: ' + memoryInfo.totalJSHeapSize);
-                    console.log('JS Heap limit: ' + memoryInfo.jsHeapSizeLimit);
+                    fk_log('debug', 'init', 'JS Heap used', memoryInfo.usedJSHeapSize);
+                    fk_log('debug', 'init', 'JS Heap total', memoryInfo.totalJSHeapSize);
+                    fk_log('debug', 'init', 'JS Heap limit', memoryInfo.jsHeapSizeLimit);
                 } else
-                    console.log('Memory info is not available in this browser.');
+                    fk_log('debug', 'init', 'memory info not available');
             }
             function initLogo() {
                 var logo_bar = document.getElementById("logo_bar");
@@ -3562,7 +3562,7 @@
                 if ('serviceWorker'in navigator) {
                     window.addEventListener('load', () => {
                         navigator.serviceWorker.register('/sw.js').then( (registration) => {
-                            console.log('Service Worker registered with scope:', registration.scope);
+                            fk_log('debug', 'sw', 'registered with scope: ' + registration.scope);
                             swc = navigator.serviceWorker.controller;
                             registration.onupdatefound = () => {
                                 const newSW = registration.installing;
@@ -3580,7 +3580,7 @@
                             ;
                         }
                         ).catch( (error) => {
-                            console.log('Service Worker registration failed:', error);
+                            fk_log('error', 'sw', 'registration failed', error);
                         }
                         );
                     }
