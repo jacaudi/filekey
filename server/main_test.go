@@ -25,6 +25,7 @@ func makeHandler(t *testing.T) http.Handler {
 		w.Header().Set("X-Content-Type-Options", "nosniff")
 		w.Header().Set("Referrer-Policy", "strict-origin-when-cross-origin")
 		w.Header().Set("Permissions-Policy", "camera=(), microphone=(), geolocation=()")
+		w.Header().Set("Strict-Transport-Security", "max-age=63072000; includeSubDomains")
 		w.Header().Set("Content-Security-Policy",
 			"default-src 'self'; "+
 				"script-src 'self' 'unsafe-inline'; "+
@@ -33,7 +34,9 @@ func makeHandler(t *testing.T) http.Handler {
 				"font-src 'self'; "+
 				"connect-src 'self'; "+
 				"manifest-src 'self'; "+
-				"worker-src 'self' blob:")
+				"worker-src 'self' blob:; "+
+				"form-action 'none'; "+
+				"base-uri 'self'")
 
 		switch r.URL.Path {
 		case "/sw.js":
@@ -110,10 +113,11 @@ func TestSecurityHeaders(t *testing.T) {
 	handler := makeHandler(t)
 
 	secHeaders := map[string]string{
-		"X-Frame-Options":        "DENY",
-		"X-Content-Type-Options": "nosniff",
-		"Referrer-Policy":        "strict-origin-when-cross-origin",
-		"Permissions-Policy":     "camera=(), microphone=(), geolocation=()",
+		"X-Frame-Options":           "DENY",
+		"X-Content-Type-Options":    "nosniff",
+		"Referrer-Policy":           "strict-origin-when-cross-origin",
+		"Permissions-Policy":        "camera=(), microphone=(), geolocation=()",
+		"Strict-Transport-Security": "max-age=63072000; includeSubDomains",
 	}
 
 	for _, path := range []string{"/", "/sw.js", "/manifest.json", "/logo.svg"} {

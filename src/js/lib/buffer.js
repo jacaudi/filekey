@@ -21,7 +21,7 @@ function buffer_helper() {
     }
     function getBufferTypedArrayConstructor(tag) {
         var type_name = tag.substring(8, tag.length - 1);
-        var window_global = Function('return this')();
+        var window_global = globalThis;
         var constructor = window_global[type_name];
         if (constructor && typeof constructor === 'function')
             return constructor;
