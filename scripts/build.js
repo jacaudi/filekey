@@ -11,10 +11,21 @@ const OUTPUT = process.argv[2] || path.join(ROOT, 'app', 'index.html');
 // Read source files
 const template = fs.readFileSync(path.join(SRC, 'index.html.tmpl'), 'utf8');
 const css = fs.readFileSync(path.join(SRC, 'css', 'styles.css'), 'utf8');
-const mainJs = fs.readFileSync(path.join(SRC, 'js', 'main.js'), 'utf8');
+
+// Read main-thread source files in dependency order
+const MAIN_FILES = [
+    'lib/debug.js', 'lib/utils.js', 'lib/buffer.js', 'lib/keccak.js',
+    'lib/crypto-storage.js', 'lib/webauthn.js', 'lib/workers.js',
+    'ui/renderer.js', 'ui/file-ops.js', 'ui/file-import.js', 'ui/menu.js',
+    'app/db-handler.js', 'app/crypto-ops.js', 'app/init.js',
+];
+const mainParts = MAIN_FILES.map(f =>
+    fs.readFileSync(path.join(SRC, 'js', f), 'utf8')
+);
+const mainJs = mainParts.join('\n');
 
 // Read worker source files in correct order
-const WORKER_FILES = ['index.js', 'encryption.js', 'buffer.js', 'keccak.js', 'ecdh.js'];
+const WORKER_FILES = ['debug.js', 'index.js', 'encryption.js', 'buffer.js', 'keccak.js', 'ecdh.js'];
 const workerParts = WORKER_FILES.map(f =>
     fs.readFileSync(path.join(SRC, 'js', 'worker', f), 'utf8')
 );
