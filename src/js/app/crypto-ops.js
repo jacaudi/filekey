@@ -37,6 +37,9 @@ function waitForWebWorker(valid=true) {
     if (valid && ww_h.scriptReady()) {
         ww_h.initWorkers(function() {
             setVersionNumber();
+            if (FK_DEBUG) {
+                ww_h.sendMessageToWorker({ msg_type: "set_debug", debug: true }, [], function() {});
+            }
         });
     }
 }
