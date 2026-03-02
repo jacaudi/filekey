@@ -18,7 +18,7 @@ jobs:
       - run: git diff --exit-code app/index.html
 
   node:
-    uses: jacaudi/github-actions/.github/workflows/test.yml@v0.11.1
+    uses: jacaudi/github-actions/.github/workflows/test.yml@v0.13.0
     with:
       test-framework: custom
       test-command: node --test app/tests/test-*.js
@@ -26,7 +26,7 @@ jobs:
       artifact-name: test-results-node
 
   go:
-    uses: jacaudi/github-actions/.github/workflows/test.yml@v0.11.1
+    uses: jacaudi/github-actions/.github/workflows/test.yml@v0.13.0
     with:
       test-framework: go
       working-directory: server

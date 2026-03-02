@@ -16,7 +16,7 @@ permissions:
 
 jobs:
   release:
-    uses: jacaudi/github-actions/.github/workflows/semantic-release.yml@v0.11.1
+    uses: jacaudi/github-actions/.github/workflows/semantic-release.yml@v0.13.0
     with:
       use-github-app: true
       allow-initial-development-versions: true
@@ -27,7 +27,7 @@ jobs:
   docker:
     needs: [release]
     if: needs.release.outputs.new-release-published == 'true'
-    uses: jacaudi/github-actions/.github/workflows/docker-build.yml@v0.11.1
+    uses: jacaudi/github-actions/.github/workflows/docker-build.yml@v0.13.0
     with:
       registry: ghcr.io
       platforms: linux/amd64,linux/arm64
