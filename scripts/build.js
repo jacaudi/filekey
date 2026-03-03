@@ -30,8 +30,11 @@ const workerParts = WORKER_FILES.map(f =>
     fs.readFileSync(path.join(SRC, 'js', 'worker', f), 'utf8')
 );
 
-// Minify worker: collapse all whitespace to single spaces
-const workerBlob = workerParts.join(' ').replace(/\s+/g, ' ').trim();
+// Minify worker: strip // comments (they break single-line output), then collapse whitespace
+const workerBlob = workerParts.join('\n')
+    .replace(/\/\/.*$/gm, '')   // remove single-line comments before collapsing newlines
+    .replace(/\s+/g, ' ')
+    .trim();
 
 // Indent helper: add prefix to each non-empty line
 function indent(text, spaces) {
