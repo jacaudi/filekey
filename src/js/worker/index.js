@@ -121,6 +121,20 @@ case "set_debug":
     fk_log('debug', 'init', 'Worker debug mode: ' + FK_DEBUG);
     self.postMessage(null);
     break;
+case "clear_keys":
+    active_prf_key = null;
+    active_prf_buff = null;
+    active_seed = null;
+    active_hkdf = null;
+    active_ecdh_priv_key = null;
+    active_ecdh_pub_key = null;
+    shared_ecdh_pub_key = null;
+    active_det_ecdh_pub_buff = null;
+    active_mp_buff = null;
+    active_pk_buff = null;
+    fk_log('debug', 'crypto', 'all keys cleared');
+    self.postMessage(null);
+    break;
 }
 function genDetEcdh(seed){
 var ret1=det_ecdh_h.generateKeyPair(seed);
@@ -175,7 +189,7 @@ name: "HKDF", hash: "SHA-256", salt: salt, info: new Uint8Array([]), }
 var derived_alg={
 name: "AES-GCM", length: 256 }
 ;
-self.crypto.subtle.deriveKey( alg, hkdf, derived_alg, true, ["encrypt", "decrypt"] ).then(function(aes_key){
+self.crypto.subtle.deriveKey( alg, hkdf, derived_alg, false, ["encrypt", "decrypt"] ).then(function(aes_key){
 cb({
 aes_key, salt}
 );

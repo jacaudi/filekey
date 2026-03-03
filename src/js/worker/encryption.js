@@ -44,7 +44,7 @@ self.crypto.subtle.deriveKey( {
 name: "ECDH", public: publicKey, }
 , privateKey, {
 name: "AES-GCM", length: 256, }
-, true, ["encrypt", "decrypt"] ).then(callback);
+, false, ["encrypt", "decrypt"] ).then(callback);
 }
 this.importEcdhPub=importEcdhPub;
 function importEcdhPub(pub_buff, cb){

@@ -98,9 +98,13 @@ function std_fillTextBoxAnimation(params, main_ele, text, custom_html_array, cb)
     }
 }
 function html_builder() {
+    function escapeHtml(str) {
+        if (typeof str !== 'string') return '';
+        return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
     this.html_newFileUpload = html_newFileUpload;
     function html_newFileUpload(params={}) {
-        return ` <div class=std_upload_outer><div class="std_uploaded set_right"><div class=icon_container> ${params.file_icon} </div><div class=std_file_container><span class=file_title title="${params.filename}">${params.filename}</span><span class=file_status>${params.file_type}</span></div></div></div> `;
+        return ` <div class=std_upload_outer><div class="std_uploaded set_right"><div class=icon_container> ${params.file_icon} </div><div class=std_file_container><span class=file_title title="${escapeHtml(params.filename)}">${escapeHtml(params.filename)}</span><span class=file_status>${params.file_type}</span></div></div></div> `;
     }
     this.html_newTextarea = html_newTextarea;
     function html_newTextarea(params={}) {
@@ -133,7 +137,7 @@ function html_builder() {
     this.html_newDownload = html_newDownload;
     function html_newDownload(params={}) {
         var file_id = "file_id_" + params.file_id;
-        return ` <div class=std_dl_outer><div class=std_download><div class=std_inner_flex><div class="icon_container some_background"> ${params.file_icon} </div><div class=std_file_container><span class=file_title title="${params.filename}">${params.filename}</span><span class=file_status>${params.file_type}</span><div class=download_icon_container><span class=dl_action id=${file_id + "_share"}>${hb.getSvg("share_icon", {
+        return ` <div class=std_dl_outer><div class=std_download><div class=std_inner_flex><div class="icon_container some_background"> ${params.file_icon} </div><div class=std_file_container><span class=file_title title="${escapeHtml(params.filename)}">${escapeHtml(params.filename)}</span><span class=file_status>${params.file_type}</span><div class=download_icon_container><span class=dl_action id=${file_id + "_share"}>${hb.getSvg("share_icon", {
             class_string: "dl_icon slight_vert_padding"
         })} Share</span> &nbsp; <span class=dl_action id=${file_id}>${hb.getSvg("save_icon", {
             class_string: "save_icon"

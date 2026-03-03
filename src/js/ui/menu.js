@@ -135,6 +135,9 @@ function clearAll() {
     active_share_prompt = null;
     main_inner.innerHTML = "";
     db_h.clearDbStore();
+    if (typeof ww_h !== 'undefined' && ww_h !== null) {
+        ww_h.sendMessageToWorker({ msg_type: "clear_keys" }, [], function() {});
+    }
     function tempTest() {}
 }
 function genNewPasskey() {
