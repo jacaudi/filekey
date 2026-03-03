@@ -23,16 +23,6 @@ let tb_h = new topbar_ns_handler({
 let webauthn_h;
 let swc = null;
 let aes_auth_tag_byte_len = 16;
-// Activate debug mode from URL parameter before anything else runs
-(function initDebugFlag() {
-    try {
-        var qs = get_query_strings(false);
-        if (qs && qs.debug === true) {
-            FK_DEBUG = true;
-            fk_log('debug', 'init', 'Debug mode enabled via ?debug=true');
-        }
-    } catch(e) { /* debug activation must never break the app */ }
-})();
 window.addEventListener("DOMContentLoaded", domInit);
 function domInit() {
     main_inner = document.getElementById("main_inner");

@@ -1,6 +1,6 @@
 "use strict";
 
-// Debug mode -- activated by ?debug=true URL parameter.
+// Debug mode -- activated by FK_DEBUG=true environment variable on the server.
 // When false, fk_log('debug', ...) calls return immediately.
 // 'error' and 'warn' levels always log regardless of FK_DEBUG.
 let FK_DEBUG = false;

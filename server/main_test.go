@@ -4,6 +4,7 @@ import (
 	"io/fs"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"strings"
 	"testing"
 )
@@ -19,6 +20,9 @@ func makeHandler(t *testing.T) http.Handler {
 		t.Fatalf("failed to read embedded index.html: %v", err)
 	}
 	indexContent := strings.Replace(string(indexBytes), "__APP_VERSION__", Version, 1)
+	if os.Getenv("FK_DEBUG") == "true" {
+		indexContent = strings.ReplaceAll(indexContent, "let FK_DEBUG = false", "let FK_DEBUG = true")
+	}
 	fileServer := http.FileServer(http.FS(appFS))
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("X-Frame-Options", "DENY")
@@ -171,5 +175,34 @@ func TestEmbeddedFiles(t *testing.T) {
 				t.Errorf("embedded file not found: %v", err)
 			}
 		})
+	}
+}
+
+func TestFKDebugInjection(t *testing.T) {
+	handler := makeHandler(t)
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	w := httptest.NewRecorder()
+	handler.ServeHTTP(w, req)
+	body := w.Body.String()
+	if !strings.Contains(body, "let FK_DEBUG = false") {
+		t.Error("default response must contain 'let FK_DEBUG = false'")
+	}
+	if strings.Contains(body, "let FK_DEBUG = true") {
+		t.Error("default response must NOT contain 'let FK_DEBUG = true'")
+	}
+}
+
+func TestFKDebugEnabled(t *testing.T) {
+	t.Setenv("FK_DEBUG", "true")
+	handler := makeHandler(t)
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	w := httptest.NewRecorder()
+	handler.ServeHTTP(w, req)
+	body := w.Body.String()
+	if strings.Contains(body, "let FK_DEBUG = false") {
+		t.Error("FK_DEBUG=true: response must NOT contain 'let FK_DEBUG = false'")
+	}
+	if !strings.Contains(body, "let FK_DEBUG = true") {
+		t.Error("FK_DEBUG=true: response must contain 'let FK_DEBUG = true'")
 	}
 }

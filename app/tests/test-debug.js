@@ -41,6 +41,11 @@ describe('Debug framework', () => {
         assert.ok(!src.includes('Uint8Array(buf)'), 'must not create typed array from buffer');
     });
 
+    it('lib/debug.js mentions env var activation', { skip: !hasFullRepo && 'skip' }, () => {
+        const src = fs.readFileSync(path.join(srcDir, 'js', 'lib', 'debug.js'), 'utf8');
+        assert.ok(src.includes('environment variable'), 'must mention environment variable activation');
+    });
+
     it('no raw console.log in main source files (only inside fk_log)', { skip: !hasFullRepo && 'skip' }, () => {
         const mainFiles = [
             'lib/utils.js', 'lib/buffer.js', 'lib/keccak.js',

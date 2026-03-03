@@ -116,11 +116,6 @@ decrypted_buff}
 }
 );
 break;
-case "set_debug":
-    FK_DEBUG = msg_event.data.debug === true;
-    fk_log('debug', 'init', 'Worker debug mode: ' + FK_DEBUG);
-    self.postMessage(null);
-    break;
 case "clear_keys":
     active_prf_key = null;
     active_prf_buff = null;

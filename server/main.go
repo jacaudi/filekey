@@ -35,6 +35,9 @@ func main() {
 		log.Fatalf("failed to read embedded index.html: %v", err)
 	}
 	indexContent := strings.Replace(string(indexBytes), "__APP_VERSION__", Version, 1)
+	if os.Getenv("FK_DEBUG") == "true" {
+		indexContent = strings.ReplaceAll(indexContent, "let FK_DEBUG = false", "let FK_DEBUG = true")
+	}
 
 	fileServer := http.FileServer(http.FS(appFS))
 
