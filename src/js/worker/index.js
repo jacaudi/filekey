@@ -2,6 +2,9 @@
 // this file is concatenated first; ww_encryption_handler, buffer_helper,
 // keccak_handler, and determineEcdh are defined in the files that follow.
 self.addEventListener("message", handleMessage);
+self.addEventListener("unhandledrejection", function(e) {
+    fk_log('error', 'init', 'unhandled rejection: ' + String(e.reason));
+});
 let eh=new ww_encryption_handler();
 let active_mp_buff=null;
 let active_pk_buff=null;
@@ -151,7 +154,10 @@ active_ecdh_pub_key=result.publicKey.key;
 function buffToHkdf(prf_buff,cb){
 self.crypto.subtle.importKey( "raw", prf_buff, {
 name: "HKDF" }
-, false, ["deriveKey", "deriveBits"] ).then(cb);
+, false, ["deriveKey", "deriveBits"] ).then(cb).catch(function(e){
+fk_log('error', 'crypto', 'buffToHkdf importKey failed: ' + e.toString());
+self.postMessage(null);
+});
 }
 function generateNewSeed(seed_name="", cb){
 var sliced_buff=active_prf_buff.slice(0,misc_slice);

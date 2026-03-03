@@ -60,6 +60,9 @@ function blobWorkersHandler() {
             });
         function createWorker_blob(blobURL) {
             const worker = new Worker(blobURL);
+            worker.onerror = function(e) {
+                fk_log('error', 'worker', 'worker error: ' + (e.message || 'unknown'));
+            };
             return worker;
         }
     }
