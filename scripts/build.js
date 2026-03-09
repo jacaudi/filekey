@@ -16,7 +16,7 @@ const css = fs.readFileSync(path.join(SRC, 'css', 'styles.css'), 'utf8');
 const MAIN_FILES = [
     'lib/debug.js', 'lib/utils.js', 'lib/buffer.js', 'lib/keccak.js',
     'lib/crypto-storage.js', 'lib/webauthn.js', 'lib/workers.js',
-    'ui/renderer.js', 'ui/file-ops.js', 'ui/file-import.js', 'ui/menu.js',
+    'ui/renderer.js', 'ui/file-ops.js', 'ui/file-import.js', 'ui/modal.js', 'ui/menu.js',
     'app/db-handler.js', 'app/crypto-ops.js', 'app/init.js',
 ];
 const mainParts = MAIN_FILES.map(f =>

@@ -25,6 +25,41 @@ self.addEventListener('fetch', event => {
     const url = new URL(event.request.url);
     if (url.origin !== self.location.origin) return;
 
+    // Navigation requests (HTML): network-first so updates are picked up immediately.
+    // Falls back to cache only when offline.
+    if (event.request.mode === 'navigate') {
+        event.respondWith(
+            fetch(event.request)
+                .then(networkResponse => {
+                    if (networkResponse && networkResponse.ok) {
+                        const responseClone = networkResponse.clone();
+                        caches.open(CACHE_NAME)
+                            .then(cache => cache.put(event.request, responseClone))
+                            .catch(err => console.error('[SW] cache.put failed:', err));
+                    }
+                    return networkResponse;
+                })
+                .catch((err) => {
+                    console.error('[SW] fetch failed:', err);
+                    return caches.match(event.request).then(cachedResponse => {
+                        if (cachedResponse) return cachedResponse;
+                        return new Response(
+                            '<!DOCTYPE html><html><head><meta charset="utf-8">' +
+                            '<meta name="viewport" content="width=device-width, initial-scale=1">' +
+                            '<title>FileKey - Offline</title></head>' +
+                            '<body style="font-family:sans-serif;text-align:center;padding:2em">' +
+                            '<h1>You are offline</h1>' +
+                            '<p>FileKey requires the initial page load to complete while online. ' +
+                            'Please reconnect and refresh.</p></body></html>',
+                            { status: 200, headers: { 'Content-Type': 'text/html' } }
+                        );
+                    });
+                })
+        );
+        return;
+    }
+
+    // All other requests: cache-first for performance.
     event.respondWith(
         caches.match(event.request)
             .then(cachedResponse => {
@@ -41,18 +76,6 @@ self.addEventListener('fetch', event => {
             })
             .catch((err) => {
                 console.error('[SW] fetch failed:', err);
-                if (event.request.mode === 'navigate') {
-                    return new Response(
-                        '<!DOCTYPE html><html><head><meta charset="utf-8">' +
-                        '<meta name="viewport" content="width=device-width, initial-scale=1">' +
-                        '<title>FileKey - Offline</title></head>' +
-                        '<body style="font-family:sans-serif;text-align:center;padding:2em">' +
-                        '<h1>You are offline</h1>' +
-                        '<p>FileKey requires the initial page load to complete while online. ' +
-                        'Please reconnect and refresh.</p></body></html>',
-                        { status: 200, headers: { 'Content-Type': 'text/html' } }
-                    );
-                }
                 return new Response('Offline',
                     { status: 503, statusText: 'Service Unavailable',
                       headers: { 'Content-Type': 'text/plain' } });
