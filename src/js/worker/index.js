@@ -3,7 +3,8 @@
 // keccak_handler, and determineEcdh are defined in the files that follow.
 self.addEventListener("message", handleMessage);
 self.addEventListener("unhandledrejection", function(e) {
-    fk_log('error', 'init', 'unhandled rejection: ' + String(e.reason));
+    fk_log('error', 'uncaught', 'unhandled rejection: ' + String(e.reason));
+    self.postMessage(null);
 });
 let eh=new ww_encryption_handler();
 let active_mp_buff=null;
@@ -177,7 +178,10 @@ cb(ret);
 function keyToSeed(imported_key, salt, info, cb){
 self.crypto.subtle.deriveBits( {
 name: "HKDF", hash: "SHA-256", salt: salt, info: info, }
-, imported_key, 512 ).then(callbackWithSeed);
+, imported_key, 512 ).then(callbackWithSeed).catch(function(e){
+fk_log('error', 'crypto', 'keyToSeed deriveBits failed: ' + e.toString());
+cb(null);
+});
 function callbackWithSeed(seed_buff){
 cb(seed_buff);
 }
@@ -195,7 +199,10 @@ cb({
 aes_key, salt}
 );
 }
-);
+).catch(function(e){
+fk_log('error', 'crypto', 'generateAesFromHkdf deriveKey failed: ' + e.toString());
+cb(null);
+});
 }
 function checkForProperty(prop){
 return (prop==="" || prop===null || prop===undefined) ? false : true;
