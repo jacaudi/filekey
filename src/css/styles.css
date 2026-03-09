@@ -615,6 +615,10 @@ body {
     .pub_key_textarea_cont {
         width: 85%
     }
+
+    dialog.fk_modal {
+        width: min(700px, 92vw);
+    }
 }
 
 .topbar_ns_container {
@@ -686,4 +690,95 @@ body {
         margin: 0 0 0 auto;
         padding: 0 5px
     }
+
+    dialog.fk_modal {
+        width: 95vw;
+        max-height: 88vh;
+    }
+
+    .fk_modal_inner {
+        max-height: 88vh;
+    }
+}
+
+dialog.fk_modal {
+    border: none;
+    padding: 0;
+    outline: none;
+    background: transparent;
+    width: min(700px, 90vw);
+    max-height: 80vh;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+dialog.fk_modal::backdrop {
+    background: rgba(0, 0, 0, 0.4);
+}
+
+.fk_modal_inner {
+    background-color: #fff;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    max-height: 80vh;
+}
+
+.fk_modal_header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px 0;
+    flex-shrink: 0;
+}
+
+.fk_modal_title {
+    font-size: 17px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.fk_modal_close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    opacity: 0.6;
+    display: flex;
+    align-items: center;
+}
+
+.fk_modal_close:hover {
+    opacity: 1;
+}
+
+.fk_modal_close svg {
+    width: 14px;
+    height: 14px;
+}
+
+.fk_modal_body {
+    padding: 20px 24px 24px;
+    overflow-y: auto;
+    flex-grow: 1;
+    font-size: 15px;
+    line-height: 145%;
+}
+
+@keyframes fk_modal_fadein {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fk_modal_backdrop_fadein {
+    from { background: rgba(0, 0, 0, 0); }
+    to { background: rgba(0, 0, 0, 0.4); }
+}
+
+dialog.fk_modal[open] {
+    animation: fk_modal_fadein 0.2s ease-out;
+}
+
+dialog.fk_modal::backdrop {
+    animation: fk_modal_backdrop_fadein 0.2s ease-out;
 }

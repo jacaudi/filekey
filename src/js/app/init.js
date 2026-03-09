@@ -20,6 +20,7 @@ let db_h;
 let tb_h = new topbar_ns_handler({
     z_index: 2139002000
 });
+let modal_h = new fk_modal_handler();
 let webauthn_h;
 let swc = null;
 let aes_auth_tag_byte_len = 16;
