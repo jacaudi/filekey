@@ -58,12 +58,6 @@ function initChizMenu() {
                 content: `<span>For questions or issues, visit our </span><a class=msg_link href=https://github.com/jacaudi/filekey/issues target=_blank>GitHub Issues</a><span> page.</span>`
             });
             return;
-        case "chiz_source_code":
-            modal_h.open({
-                title: "Source Code",
-                content: `<span>View the full source code on </span><a class=msg_link href=https://github.com/jacaudi/filekey target=_blank>GitHub</a><span>.</span>`
-            });
-            return;
         case "chiz_terms":
             modal_h.open({
                 title: "Terms of Service",
