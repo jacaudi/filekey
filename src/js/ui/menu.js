@@ -127,6 +127,7 @@ function clearAll() {
     if (typeof ww_h !== 'undefined' && ww_h !== null) {
         ww_h.sendMessageToWorker({ msg_type: "clear_keys" }, [], function() {});
     }
+    initMessage();
 }
 function genNewPasskey() {
     var prf_obj = {
