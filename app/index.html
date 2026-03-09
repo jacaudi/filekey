@@ -3104,50 +3104,33 @@
                     }
                 }
             }
-            function displayPublicKey(main_inner) {
-                var html_string = "";
-                var temp_pub = "";
-                var rand_copy_id = null;
-                var rand_svg_id = null;
-                var rand_pub_id = null;
-                var rand_id = getRandomInclusive(1, 100000000);
-                getDetEcdhPublicKey(function(ret) {
-                    var events_obj = {};
-                    if (ret == null)
-                        html_string = `<span>Authentication required to generate share key.</span>`;
-                    else {
-                        temp_pub = bh.bufferToHex(ret);
-                        rand_copy_id = "copy_button_" + rand_id;
-                        rand_svg_id = "copy_svg_cont_" + rand_id;
-                        rand_pub_id = "copy_pub_" + rand_id;
-                        var copy_icon = hb.getSvg("copy_icon", {
-                            class_string: "copy_icon"
-                        });
-                        html_string = ` <span>Your share key is a public key that allows others to encrypt data that only you can decrypt:</span><p class=word_broken>${temp_pub}</p><div class=copy_button id=${rand_copy_id} class=no_select><span id=${rand_svg_id}></span><span id=${rand_pub_id}>Copy</span></div>`;
-                    }
-                    htmlWriter({
-                        char_speed: 8
-                    }, html_string, main_inner, events_obj, function(ret) {
-                        if (rand_copy_id != null) {
-                            var copy_svg_cont = document.getElementById(rand_svg_id);
-                            copy_svg_cont.innerHTML = copy_icon;
-                            var copy_button = document.getElementById(rand_copy_id);
-                            copy_button.addEventListener("click", copyPub);
-                        }
-                    });
-                    scrollToBottom();
+            function displayPublicKey() {
+                modal_h.open({
+                    title: "Your Share Key",
+                    content: "<p>Authenticating...</p>"
                 });
-                function copyPub() {
-                    copy_to_clipboard(temp_pub, function(res) {
-                        if (res) {
-                            var copy_pub = document.getElementById(rand_pub_id);
-                            copy_pub.innerText = "Copied!";
-                            window.setTimeout(function() {
-                                copy_pub.innerText = "Copy";
-                            }, 1000);
-                        }
-                    });
-                }
+                getDetEcdhPublicKey(function(ret) {
+                    if (!modal_h.isOpen()) return;
+                    if (ret == null) {
+                        modal_h.updateBody("<p>Authentication required to generate share key.</p>");
+                    } else {
+                        var pub_hex = bh.bufferToHex(ret);
+                        var copy_icon = hb.getSvg("copy_icon", { class_string: "copy_icon" });
+                        var content = `<p>Your share key is a public key that allows others to encrypt data that only you can decrypt:</p><p class=word_broken>${pub_hex}</p><div class="copy_button no_select" id=fk_modal_copy_btn><span id=fk_modal_copy_svg></span><span id=fk_modal_copy_text>Copy</span></div>`;
+                        modal_h.updateBody(content, function() {
+                            document.getElementById("fk_modal_copy_svg").innerHTML = copy_icon;
+                            document.getElementById("fk_modal_copy_btn").addEventListener("click", function() {
+                                copy_to_clipboard(pub_hex, function(res) {
+                                    if (res) {
+                                        var t = document.getElementById("fk_modal_copy_text");
+                                        t.innerText = "Copied!";
+                                        window.setTimeout(function() { t.innerText = "Copy"; }, 1000);
+                                    }
+                                });
+                            });
+                        });
+                    }
+                });
             }
             function getDetEcdhPublicKey(cb) {
                 var msg_param = {
