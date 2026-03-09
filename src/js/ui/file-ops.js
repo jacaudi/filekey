@@ -54,6 +54,11 @@ function createDownloadEle(dl_obj) {
                     return;
                 }
                 shareEnc(ps_data, function(res) {
+                    if (res === null) {
+                        var html_string = "<span>Failed to encrypt file for sharing. Please try again.</span>";
+                        htmlWriter(getErrorParams(), html_string, main_inner);
+                        return;
+                    }
                     var combined_buff = combineArrayBuffers(res.salt, res.encrypted_buff);
                     combined_buff = combineArrayBuffers(pub, combined_buff);
                     download_ab(new_filename, combined_buff);
@@ -369,6 +374,12 @@ function doStuff() {
         (function nextFile(file) {
             getFlatFile(file, function(file_contents, filename) {
                 encNewMsg(file_contents, function(ret) {
+                    if (ret === null) {
+                        status_obj.animator.clearStatus();
+                        var html_string = "<span>Failed to encrypt file. Please try again.</span>";
+                        htmlWriter(getErrorParams(), html_string, main_inner);
+                        return;
+                    }
                     var combined_buff = combineArrayBuffers(ret.salt, ret.encrypted_buff);
                     var new_filename = filename + ".filekey";
                     newDownloadObj(new_filename, combined_buff, {
