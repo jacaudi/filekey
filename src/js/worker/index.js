@@ -35,8 +35,10 @@ self.postMessage(null);
 );
 break;
 case "set_seed": generateNewSeed(msg_event.data.seed_name, function(seed){
+if(seed===null){ self.postMessage(null); return; }
 active_seed=seed;
 seedToHkdf(seed,function(hkdf){
+if(hkdf===null){ self.postMessage(null); return; }
 active_hkdf=hkdf;
 self.postMessage(null);
 genDetEcdh(active_seed);
@@ -57,9 +59,11 @@ break;
 case "new_enc": var key=active_hkdf;
 var msg_buff=msg_event.data.msg_buff;
 generateAesFromHkdf(key, null, function(ret){
+if(ret===null){ self.postMessage(null); return; }
 var key_salt=ret.salt;
 var aes_key=ret.aes_key;
 eh.encrypt(aes_key, msg_buff, key_salt, function(encrypted_buff){
+if(encrypted_buff===null){ self.postMessage(null); return; }
 self.postMessage({
 encrypted_buff, salt:key_salt}
 , [encrypted_buff,key_salt]);
@@ -72,6 +76,7 @@ case "new_dec": var key=active_hkdf;
 var msg_buff=msg_event.data.msg_buff;
 var key_salt=msg_buff.slice(0,salt_byte_len);
 generateAesFromHkdf(key, key_salt, function(ret){
+if(ret===null){ self.postMessage(null); return; }
 var aes_key=ret.aes_key;
 eh.noDecodeDecrypt(aes_key, msg_buff.slice(salt_byte_len), key_salt, function(decrypted_buff){
 if(decrypted_buff===null) self.postMessage(null);
@@ -84,6 +89,7 @@ decrypted_buff}
 );
 break;
 case "set_shared_pub": eh.importEcdhPub(msg_event.data.pub_buff, function(key){
+if(key===null){ self.postMessage(null); return; }
 shared_ecdh_pub_key=key;
 self.postMessage(true);
 }
@@ -91,9 +97,11 @@ self.postMessage(true);
 break;
 case "shared_ecdh_enc": var msg_buff=msg_event.data.msg_buff;
 eh.deriveEcdhKey(active_ecdh_priv_key, shared_ecdh_pub_key, function(derived_key){
+if(derived_key===null){ self.postMessage(null); return; }
 var iv=self.crypto.getRandomValues(new Uint8Array(salt_byte_len));
 iv=iv.buffer;
 eh.encrypt(derived_key, msg_buff, iv, function(encrypted_buff){
+if(encrypted_buff===null){ self.postMessage(null); return; }
 var salt=iv;
 self.postMessage({
 encrypted_buff, salt}
@@ -107,7 +115,9 @@ case "shared_ecdh_dec": var msg_buff=msg_event.data.msg_buff;
 var key_salt=msg_buff.slice(0,salt_byte_len);
 msg_buff=msg_buff.slice(salt_byte_len);
 eh.importEcdhPub(msg_event.data.pub_buff, function(shared_pub){
+if(shared_pub===null){ self.postMessage(null); return; }
 eh.deriveEcdhKey(active_ecdh_priv_key, shared_pub, function(derived_key){
+if(derived_key===null){ self.postMessage(null); return; }
 eh.noDecodeDecrypt(derived_key, msg_buff, key_salt, function(decrypted_buff){
 if(decrypted_buff===null) self.postMessage(null);
 else self.postMessage({
