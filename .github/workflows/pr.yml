@@ -1,0 +1,68 @@
+---
+name: PR Validation
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  lint-go:
+    name: Lint Go
+    uses: jacaudi/github-actions/.github/workflows/lint.yml@v0.13.0
+    with:
+      go: true
+      working-directory: server
+
+  lint-config:
+    name: Lint Config
+    uses: jacaudi/github-actions/.github/workflows/lint.yml@v0.13.0
+    with:
+      yaml: true
+      yamllint-config: .yamllint.yml
+      json: true
+
+  test-node:
+    name: Test Node
+    uses: jacaudi/github-actions/.github/workflows/test.yml@v0.13.0
+    with:
+      test-framework: custom
+      test-command: node --test app/tests/test-*.js
+      node-version: '22'
+      artifact-name: test-results-node
+
+  test-go:
+    name: Test Go
+    uses: jacaudi/github-actions/.github/workflows/test.yml@v0.13.0
+    with:
+      test-framework: go
+      working-directory: server
+      go-version: stable
+      setup-command: cp -r app server/app
+      artifact-name: test-results-go
+
+  build-check:
+    name: Build Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node scripts/build.js
+      - run: git diff --exit-code app/index.html
+
+  docker:
+    name: Docker Build
+    needs: [lint-go, lint-config, test-node, test-go, build-check]
+    uses: jacaudi/github-actions/.github/workflows/docker-build.yml@v0.13.0
+    permissions:
+      contents: read
+      packages: write
+    with:
+      image-name: ${{ github.repository }}
+      platforms: linux/amd64,linux/arm64
+      push: false
