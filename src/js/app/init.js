@@ -123,7 +123,7 @@ function initLogo() {
     });
 }
 function initMessage() {
-    var html_string = ` <strong>Files need protection. FileKey secures them</strong><span>. Works with passkeys. Drop files in. They lock. Drop them again. They unlock. Your data stays on your device, and only you hold the key. Open source and powered by AES-256 encryption—the same standard trusted by the US government for top-secret information.</span> `;
+    var html_string = ` <strong>Files need protection. FileKey secures them</strong><span>. Works with passkeys. Drop files in. They lock. Drop them again. They unlock. Your data stays on your device, and only you hold the key. Open source and powered by AES-256 encryption.</span> `;
     htmlWriter({
         char_speed: 12
     }, html_string, main_inner, {}, function() {
