@@ -597,6 +597,88 @@
                 cursor: pointer;
             }
 
+            dialog.fk_modal {
+                border: none;
+                padding: 0;
+                outline: none;
+                background: transparent;
+                width: min(700px, 90vw);
+                max-height: 80vh;
+                border-radius: 10px;
+                overflow: hidden;
+            }
+
+            dialog.fk_modal::backdrop {
+                background: rgba(0, 0, 0, 0.4);
+            }
+
+            .fk_modal_inner {
+                background-color: #fff;
+                border-radius: 10px;
+                display: flex;
+                flex-direction: column;
+                max-height: 80vh;
+            }
+
+            .fk_modal_header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 20px 24px 0;
+                flex-shrink: 0;
+            }
+
+            .fk_modal_title {
+                font-size: 17px;
+                font-weight: 600;
+                margin: 0;
+            }
+
+            .fk_modal_close {
+                background: none;
+                border: none;
+                cursor: pointer;
+                padding: 8px;
+                opacity: 0.6;
+                display: flex;
+                align-items: center;
+            }
+
+            .fk_modal_close:hover {
+                opacity: 1;
+            }
+
+            .fk_modal_close svg {
+                width: 14px;
+                height: 14px;
+            }
+
+            .fk_modal_body {
+                padding: 20px 24px 24px;
+                overflow-y: auto;
+                flex-grow: 1;
+                font-size: 15px;
+                line-height: 145%;
+            }
+
+            @keyframes fk_modal_fadein {
+                from { opacity: 0; transform: translateY(8px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+
+            @keyframes fk_modal_backdrop_fadein {
+                from { background: rgba(0, 0, 0, 0); }
+                to { background: rgba(0, 0, 0, 0.4); }
+            }
+
+            dialog.fk_modal[open] {
+                animation: fk_modal_fadein 0.2s ease-out;
+            }
+
+            dialog.fk_modal::backdrop {
+                animation: fk_modal_backdrop_fadein 0.2s ease-out;
+            }
+
             @media screen and (max-width: 1080px) {
                 #main_window {
                     flex-direction:column;
@@ -719,88 +801,6 @@
                 .fk_modal_inner {
                     max-height: 88vh;
                 }
-            }
-
-            dialog.fk_modal {
-                border: none;
-                padding: 0;
-                outline: none;
-                background: transparent;
-                width: min(700px, 90vw);
-                max-height: 80vh;
-                border-radius: 10px;
-                overflow: hidden;
-            }
-
-            dialog.fk_modal::backdrop {
-                background: rgba(0, 0, 0, 0.4);
-            }
-
-            .fk_modal_inner {
-                background-color: #fff;
-                border-radius: 10px;
-                display: flex;
-                flex-direction: column;
-                max-height: 80vh;
-            }
-
-            .fk_modal_header {
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                padding: 20px 24px 0;
-                flex-shrink: 0;
-            }
-
-            .fk_modal_title {
-                font-size: 17px;
-                font-weight: 600;
-                margin: 0;
-            }
-
-            .fk_modal_close {
-                background: none;
-                border: none;
-                cursor: pointer;
-                padding: 8px;
-                opacity: 0.6;
-                display: flex;
-                align-items: center;
-            }
-
-            .fk_modal_close:hover {
-                opacity: 1;
-            }
-
-            .fk_modal_close svg {
-                width: 14px;
-                height: 14px;
-            }
-
-            .fk_modal_body {
-                padding: 20px 24px 24px;
-                overflow-y: auto;
-                flex-grow: 1;
-                font-size: 15px;
-                line-height: 145%;
-            }
-
-            @keyframes fk_modal_fadein {
-                from { opacity: 0; transform: translateY(8px); }
-                to { opacity: 1; transform: translateY(0); }
-            }
-
-            @keyframes fk_modal_backdrop_fadein {
-                from { background: rgba(0, 0, 0, 0); }
-                to { background: rgba(0, 0, 0, 0.4); }
-            }
-
-            dialog.fk_modal[open] {
-                animation: fk_modal_fadein 0.2s ease-out;
-            }
-
-            dialog.fk_modal::backdrop {
-                animation: fk_modal_backdrop_fadein 0.2s ease-out;
             }
         </style>
     </head>
@@ -2966,6 +2966,7 @@
                 dialog_ele.className = "fk_modal";
                 dialog_ele.setAttribute("role", "dialog");
                 dialog_ele.setAttribute("aria-labelledby", "fk_modal_title");
+                dialog_ele.setAttribute("aria-modal", "true");
                 var modal_inner = document.createElement("div");
                 modal_inner.className = "fk_modal_inner";
                 var modal_header = document.createElement("div");
@@ -2984,9 +2985,11 @@
                 modal_inner.appendChild(modal_header);
                 modal_inner.appendChild(modal_body);
                 dialog_ele.appendChild(modal_inner);
+                // Requires <body> to exist; works because <script> is at end of <body> in generated HTML.
                 document.body.appendChild(dialog_ele);
                 modal_close.addEventListener("click", close);
                 dialog_ele.addEventListener("cancel", function(e) {
+                    // preventDefault stops the browser from calling its own close() before our cleanup runs.
                     e.preventDefault();
                     close();
                 });
@@ -2997,6 +3000,7 @@
                     }
                 });
                 this.open = function(params) {
+                    if (dialog_ele.open) return;
                     modal_title.textContent = params.title || "";
                     modal_body.innerHTML = params.content || "";
                     dialog_ele.showModal();
@@ -3011,7 +3015,7 @@
                     return dialog_ele.open;
                 };
                 function close() {
-                    dialog_ele.close();
+                    if (dialog_ele.open) dialog_ele.close();
                     modal_title.textContent = "";
                     modal_body.innerHTML = "";
                 }
@@ -3116,8 +3120,9 @@
                     } else {
                         var pub_hex = bh.bufferToHex(ret);
                         var copy_icon = hb.getSvg("copy_icon", { class_string: "copy_icon" });
-                        var content = `<p>Your share key is a public key that allows others to encrypt data that only you can decrypt:</p><p class=word_broken>${pub_hex}</p><div class="copy_button no_select" id=fk_modal_copy_btn><span id=fk_modal_copy_svg></span><span id=fk_modal_copy_text>Copy</span></div>`;
+                        var content = `<p>Your share key is a public key that allows others to encrypt data that only you can decrypt:</p><p class=word_broken id=fk_modal_pub_key></p><div class="copy_button no_select" id=fk_modal_copy_btn><span id=fk_modal_copy_svg></span><span id=fk_modal_copy_text>Copy</span></div>`;
                         modal_h.updateBody(content, function() {
+                            document.getElementById("fk_modal_pub_key").textContent = pub_hex;
                             document.getElementById("fk_modal_copy_svg").innerHTML = copy_icon;
                             document.getElementById("fk_modal_copy_btn").addEventListener("click", function() {
                                 copy_to_clipboard(pub_hex, function(res) {
@@ -3587,7 +3592,7 @@
             let tb_h = new topbar_ns_handler({
                 z_index: 2139002000
             });
-            let modal_h = new fk_modal_handler();
+            let modal_h = new fk_modal_handler(); // Runs at parse time; requires <body> — works because <script> is inside <body>.
             let webauthn_h;
             let swc = null;
             let aes_auth_tag_byte_len = 16;

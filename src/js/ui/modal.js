@@ -3,6 +3,7 @@ function fk_modal_handler() {
     dialog_ele.className = "fk_modal";
     dialog_ele.setAttribute("role", "dialog");
     dialog_ele.setAttribute("aria-labelledby", "fk_modal_title");
+    dialog_ele.setAttribute("aria-modal", "true");
     var modal_inner = document.createElement("div");
     modal_inner.className = "fk_modal_inner";
     var modal_header = document.createElement("div");
@@ -21,9 +22,11 @@ function fk_modal_handler() {
     modal_inner.appendChild(modal_header);
     modal_inner.appendChild(modal_body);
     dialog_ele.appendChild(modal_inner);
+    // Requires <body> to exist; works because <script> is at end of <body> in generated HTML.
     document.body.appendChild(dialog_ele);
     modal_close.addEventListener("click", close);
     dialog_ele.addEventListener("cancel", function(e) {
+        // preventDefault stops the browser from calling its own close() before our cleanup runs.
         e.preventDefault();
         close();
     });
@@ -34,6 +37,7 @@ function fk_modal_handler() {
         }
     });
     this.open = function(params) {
+        if (dialog_ele.open) return;
         modal_title.textContent = params.title || "";
         modal_body.innerHTML = params.content || "";
         dialog_ele.showModal();
@@ -48,7 +52,7 @@ function fk_modal_handler() {
         return dialog_ele.open;
     };
     function close() {
-        dialog_ele.close();
+        if (dialog_ele.open) dialog_ele.close();
         modal_title.textContent = "";
         modal_body.innerHTML = "";
     }

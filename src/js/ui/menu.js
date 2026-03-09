@@ -97,8 +97,9 @@ function displayPublicKey() {
         } else {
             var pub_hex = bh.bufferToHex(ret);
             var copy_icon = hb.getSvg("copy_icon", { class_string: "copy_icon" });
-            var content = `<p>Your share key is a public key that allows others to encrypt data that only you can decrypt:</p><p class=word_broken>${pub_hex}</p><div class="copy_button no_select" id=fk_modal_copy_btn><span id=fk_modal_copy_svg></span><span id=fk_modal_copy_text>Copy</span></div>`;
+            var content = `<p>Your share key is a public key that allows others to encrypt data that only you can decrypt:</p><p class=word_broken id=fk_modal_pub_key></p><div class="copy_button no_select" id=fk_modal_copy_btn><span id=fk_modal_copy_svg></span><span id=fk_modal_copy_text>Copy</span></div>`;
             modal_h.updateBody(content, function() {
+                document.getElementById("fk_modal_pub_key").textContent = pub_hex;
                 document.getElementById("fk_modal_copy_svg").innerHTML = copy_icon;
                 document.getElementById("fk_modal_copy_btn").addEventListener("click", function() {
                     copy_to_clipboard(pub_hex, function(res) {
