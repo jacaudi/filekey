@@ -21,7 +21,7 @@ return new_ab;
 }
 function getBufferTypedArrayConstructor(tag){
 var type_name=tag.substring(8, tag.length-1);
-var window_global=Function('return this')();
+var window_global=globalThis;
 var constructor=window_global[type_name];
 if(constructor && typeof constructor==='function') return constructor;
 else throw new TypeError("Invalid typed array type tag: "+tag);

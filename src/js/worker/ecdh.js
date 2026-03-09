@@ -171,7 +171,7 @@ success: true, key, pkcs8Buffer: pkcs8.buffer }
 );
 }
 ).catch(function(error) {
-console.error("PKCS#8 import failed:", error);
+fk_log('error', 'crypto', 'PKCS#8 import failed: ' + error.message);
 inner_cb({
 success: false, error: error.message }
 );
@@ -208,7 +208,7 @@ success: true, key, rawBuffer: rawPublicKey.buffer }
 );
 }
 ).catch(function(error){
-console.error("Public key raw import failed:", error);
+fk_log('error', 'crypto', 'Public key raw import failed: ' + error.message);
 inner_cb({
 success: false, error: error.message }
 );

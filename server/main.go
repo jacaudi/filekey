@@ -35,6 +35,9 @@ func main() {
 		log.Fatalf("failed to read embedded index.html: %v", err)
 	}
 	indexContent := strings.Replace(string(indexBytes), "__APP_VERSION__", Version, 1)
+	if os.Getenv("FK_DEBUG") == "true" {
+		indexContent = strings.ReplaceAll(indexContent, "let FK_DEBUG = false", "let FK_DEBUG = true")
+	}
 
 	fileServer := http.FileServer(http.FS(appFS))
 
@@ -43,6 +46,7 @@ func main() {
 		w.Header().Set("X-Content-Type-Options", "nosniff")
 		w.Header().Set("Referrer-Policy", "strict-origin-when-cross-origin")
 		w.Header().Set("Permissions-Policy", "camera=(), microphone=(), geolocation=()")
+		w.Header().Set("Strict-Transport-Security", "max-age=63072000; includeSubDomains")
 		w.Header().Set("Content-Security-Policy",
 			"default-src 'self'; "+
 				"script-src 'self' 'unsafe-inline'; "+
@@ -51,7 +55,9 @@ func main() {
 				"font-src 'self'; "+
 				"connect-src 'self'; "+
 				"manifest-src 'self'; "+
-				"worker-src 'self' blob:")
+				"worker-src 'self' blob:; "+
+				"form-action 'none'; "+
+				"base-uri 'self'")
 
 		switch r.URL.Path {
 		case "/sw.js":

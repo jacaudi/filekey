@@ -14,6 +14,14 @@ const outputFile = path.join(__dirname, '..', 'index.html');
 // Check for scripts/ directory (exists after Task 1 extraction, but before Task 3 build.js).
 const hasFullRepo = fs.existsSync(path.join(repoRoot, 'scripts'));
 
+// Main-thread source files in dependency order (matches MAIN_FILES in scripts/build.js)
+const MAIN_FILES = [
+    'lib/debug.js', 'lib/utils.js', 'lib/buffer.js', 'lib/keccak.js',
+    'lib/crypto-storage.js', 'lib/webauthn.js', 'lib/workers.js',
+    'ui/renderer.js', 'ui/file-ops.js', 'ui/file-import.js', 'ui/menu.js',
+    'app/db-handler.js', 'app/crypto-ops.js', 'app/init.js',
+];
+
 describe('Build system (Issue #27)', () => {
     it('build script exists', { skip: !hasFullRepo && 'requires full repo access' }, () => {
         assert.ok(fs.existsSync(buildScript), 'scripts/build.js must exist');
@@ -28,13 +36,34 @@ describe('Build system (Issue #27)', () => {
         assert.ok(css.length > 100, 'CSS file must have content');
     });
 
-    it('source main.js exists', { skip: !hasFullRepo && 'requires full repo access' }, () => {
-        const js = fs.readFileSync(path.join(srcDir, 'js', 'main.js'), 'utf8');
-        assert.ok(js.includes('"use strict"'), 'main.js must start with use strict');
+    it('all main source files exist', { skip: !hasFullRepo && 'requires full repo access' }, () => {
+        for (const f of MAIN_FILES) {
+            assert.ok(fs.existsSync(path.join(srcDir, 'js', f)),
+                `src/js/${f} must exist`);
+        }
     });
 
-    it('all 5 worker source files exist', { skip: !hasFullRepo && 'requires full repo access' }, () => {
-        for (const f of ['index.js', 'encryption.js', 'buffer.js', 'keccak.js', 'ecdh.js']) {
+    it('no main source file exceeds 600 lines', { skip: !hasFullRepo && 'requires full repo access' }, () => {
+        for (const f of MAIN_FILES) {
+            const content = fs.readFileSync(path.join(srcDir, 'js', f), 'utf8');
+            const lineCount = content.split('\n').length;
+            assert.ok(lineCount <= 600,
+                `src/js/${f} has ${lineCount} lines (max 600)`);
+        }
+    });
+
+    it('first source file starts with use strict', { skip: !hasFullRepo && 'requires full repo access' }, () => {
+        const debug = fs.readFileSync(path.join(srcDir, 'js', 'lib', 'debug.js'), 'utf8');
+        assert.ok(debug.startsWith('"use strict"'), 'lib/debug.js must start with use strict');
+    });
+
+    it('worker debug.js exists', { skip: !hasFullRepo && 'requires full repo access' }, () => {
+        assert.ok(fs.existsSync(path.join(srcDir, 'js', 'worker', 'debug.js')),
+            'src/js/worker/debug.js must exist');
+    });
+
+    it('all 6 worker source files exist', { skip: !hasFullRepo && 'requires full repo access' }, () => {
+        for (const f of ['debug.js', 'index.js', 'encryption.js', 'buffer.js', 'keccak.js', 'ecdh.js']) {
             assert.ok(fs.existsSync(path.join(srcDir, 'js', 'worker', f)),
                 `src/js/worker/${f} must exist`);
         }
