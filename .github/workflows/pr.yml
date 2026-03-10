@@ -30,6 +30,7 @@ jobs:
     uses: jacaudi/github-actions/.github/workflows/test.yml@v0.13.0
     with:
       test-framework: custom
+      setup-command: node scripts/build.js
       test-command: node --test app/tests/test-*.js
       node-version: '22'
       artifact-name: test-results-node
@@ -41,23 +42,12 @@ jobs:
       test-framework: go
       working-directory: server
       go-version: stable
-      setup-command: cp -r app server/app
+      setup-command: node scripts/build.js && cp -r app server/app
       artifact-name: test-results-go
-
-  build-check:
-    name: Build Check
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-      - run: node scripts/build.js
-      - run: git diff --exit-code app/index.html
 
   docker:
     name: Docker Build
-    needs: [lint-go, lint-config, test-node, test-go, build-check]
+    needs: [lint-go, lint-config, test-node, test-go]
     uses: jacaudi/github-actions/.github/workflows/docker-build.yml@v0.13.0
     permissions:
       contents: read
