@@ -42,6 +42,7 @@ jobs:
       test-framework: go
       working-directory: server
       go-version: stable
+      # node scripts/build.js relies on the Node.js pre-installed on ubuntu-latest (~v20+)
       setup-command: node scripts/build.js && cp -r app server/app
       artifact-name: test-results-go
 

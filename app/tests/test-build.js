@@ -70,13 +70,13 @@ describe('Build system (Issue #27)', () => {
     });
 
     it('build script produces valid output', { skip: !hasFullRepo && 'requires full repo access' }, () => {
-        // Build to a temp file — avoids mutating the committed app/index.html
+        // Build to a temp file — avoids overwriting the on-disk app/index.html
         const tmp = path.join(os.tmpdir(), `index-build-test-${process.pid}.html`);
         try {
             execSync(`node scripts/build.js ${tmp}`, { cwd: repoRoot });
             const built = fs.readFileSync(tmp, 'utf8');
-            const committed = fs.readFileSync(outputFile, 'utf8');
-            assert.strictEqual(built, committed, 'Build output must match committed file');
+            const onDisk = fs.readFileSync(outputFile, 'utf8');
+            assert.strictEqual(built, onDisk, 'Build output must match on-disk app/index.html');
         } finally {
             if (fs.existsSync(tmp)) fs.unlinkSync(tmp);
         }
