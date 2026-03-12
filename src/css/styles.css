@@ -767,8 +767,12 @@ dialog.fk_modal::backdrop {
 }
 
 @media(orientation: portrait) and (max-width: 800px) {
+    #logo_container, #chiz_container {
+        top: env(safe-area-inset-top, 8px);
+    }
+
     #main_container {
-        padding: 14vh 5vw 0;
+        padding: calc(14vh + env(safe-area-inset-top, 8px)) 5vw 0;
         font-size: 15px;
     }
 
