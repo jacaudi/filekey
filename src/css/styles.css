@@ -671,8 +671,12 @@ dialog.fk_modal::backdrop {
     }
 
     #main_container {
-        padding: 15vh 5vw;
+        padding: 12vh 5vw 0;
         width: 100%;
+    }
+
+    #main_inner {
+        padding-bottom: 18vh;
     }
 
     #logo_container {
@@ -763,6 +767,24 @@ dialog.fk_modal::backdrop {
 }
 
 @media(orientation: portrait) and (max-width: 800px) {
+    #main_container {
+        padding: 11vh 5vw 0;
+        font-size: 15px;
+    }
+
+    #main_inner {
+        padding-bottom: 16vh;
+    }
+
+    .std_outer {
+        margin-top: 12px;
+        margin-bottom: 12px;
+    }
+
+    #drop_container {
+        width: 90%;
+    }
+
     .std_notification_msg {
         font-size:16px;
     }
