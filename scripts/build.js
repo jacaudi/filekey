@@ -47,9 +47,17 @@ function indent(text, spaces) {
 // Assemble: CSS
 let output = template.replace('{{CSS}}', indent(css.trimEnd(), 12));
 
+// Read and prepare LICENSE content for the modal
+const licenseRaw = fs.readFileSync(path.join(ROOT, 'LICENSE'), 'utf8');
+const licenseHtml = '<pre style="white-space:pre-wrap;font-family:monospace;font-size:12px;margin:0">'
+    + licenseRaw.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    + '</pre>';
+// Escape for safe embedding in a JS template literal
+const licenseLiteral = licenseHtml.replace(/\\/g, '\\\\').replace(/`/g, '\\`').replace(/\$\{/g, '\\${');
+
 // Assemble: JS = main.js + worker blob assignment
 const workerLine = 'let ww_js_script = ` ' + workerBlob + ' `;';
-const fullScript = mainJs.trimEnd() + '\n' + workerLine;
+const fullScript = (mainJs.trimEnd() + '\n' + workerLine).replace('{{LICENSE_CONTENT}}', licenseLiteral);
 output = output.replace('{{SCRIPT}}', indent(fullScript, 12));
 
 // Write output

@@ -67,7 +67,7 @@ function initChizMenu() {
         case "chiz_license":
             modal_h.open({
                 title: "License",
-                content: `<p>FileKey version 1 is released under the GNU General Public License v3.0 (GPLv3).</p><p>This means that you are free to use, modify, and distribute FileKey under the terms of the GPLv3 license. However, any modifications or derivative works must also be released under the same open-source license.</p><p><span>You can read the </span><a class=msg_link href=https://www.gnu.org/licenses/gpl-3.0.en.html target=_blank>full license text here.</a></p><p>By using FileKey, you agree to the terms of this license. If you contribute to the project, you also acknowledge that your contributions will be made available under GPLv3.</p>`
+                content: `{{LICENSE_CONTENT}}`
             });
             return;
         }

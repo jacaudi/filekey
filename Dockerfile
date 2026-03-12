@@ -18,6 +18,7 @@ WORKDIR /build
 COPY scripts/ scripts/
 COPY src/ src/
 COPY app/ app/
+COPY LICENSE LICENSE
 RUN node scripts/build.js
 
 # =============================================================
