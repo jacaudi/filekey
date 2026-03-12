@@ -52,3 +52,15 @@ describe('dark mode toggle button', function() {
         assert.ok(html.includes('id=theme_toggle'), 'missing #theme_toggle button');
     });
 });
+
+describe('dark mode JS', function() {
+    it('defines initTheme function', function() {
+        assert.ok(script.includes('function initTheme('), 'missing initTheme');
+    });
+    it('defines toggleTheme function', function() {
+        assert.ok(script.includes('function toggleTheme('), 'missing toggleTheme');
+    });
+    it('calls initTheme in domInit', function() {
+        assert.ok(script.includes('initTheme()'), 'initTheme not called');
+    });
+});
