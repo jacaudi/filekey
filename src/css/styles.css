@@ -45,7 +45,7 @@ body {
     background-color: #fff;
     height: 100vh;
     flex-grow: 1;
-    padding: 15vh 25% 0;
+    padding: calc(15vh + 8px) 25% 0;
     flex-direction: column;
 }
 
@@ -175,6 +175,7 @@ body {
     position: fixed;
     width: 25%;
     flex-direction: column;
+    top: 8px;
 }
 
 #logo_container {
