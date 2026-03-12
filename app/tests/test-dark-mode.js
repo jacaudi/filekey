@@ -37,3 +37,12 @@ describe('dark mode CSS', function() {
         assert.ok(!css.includes('background-color: #fff'), 'hardcoded background-color: #fff found');
     });
 });
+
+describe('dark mode icons', function() {
+    it('has moon_icon in getSvg', function() {
+        assert.ok(script.includes('"moon_icon"'), 'missing moon_icon');
+    });
+    it('has sun_icon in getSvg', function() {
+        assert.ok(script.includes('"sun_icon"'), 'missing sun_icon');
+    });
+});
