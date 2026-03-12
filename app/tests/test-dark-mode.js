@@ -46,3 +46,9 @@ describe('dark mode icons', function() {
         assert.ok(script.includes('"sun_icon"'), 'missing sun_icon');
     });
 });
+
+describe('dark mode toggle button', function() {
+    it('has theme_toggle button in HTML', function() {
+        assert.ok(html.includes('id=theme_toggle'), 'missing #theme_toggle button');
+    });
+});

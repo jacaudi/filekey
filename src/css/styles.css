@@ -249,6 +249,28 @@ body {
     right: 0;
 }
 
+#theme_toggle {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    line-height: 0;
+    opacity: 0.6;
+}
+
+#theme_toggle:hover {
+    opacity: 1;
+}
+
+#theme_toggle svg {
+    width: 18px;
+    height: 18px;
+}
+
 #chiz_hidden_click_container {
     display: none;
     position: fixed;
@@ -766,7 +788,9 @@ dialog.fk_modal::backdrop {
     }
 
     #chiz_container {
-        z-index: 1101
+        z-index: 1101;
+        padding-right: 16px;
+        gap: 8px;
     }
 
     .pub_key_textarea_cont {
