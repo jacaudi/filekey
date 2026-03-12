@@ -31,6 +31,9 @@
     }
 }
 
+/* Dark values are intentionally duplicated below: the media query above applies
+   only when no data-theme attribute is set (OS default), while this rule handles
+   the user's explicit manual override. Both must stay in sync. */
 html[data-theme="dark"] {
     color-scheme: dark;
     --bg: #1a1a1a;
@@ -60,6 +63,7 @@ html[data-theme="light"] {
     --blue: #1377f9;
     --blue-border: #1377f921;
     --blue-bg: #1377f91a;
+    --drag-zone-bg: #c0f0ff33;
 }
 
 html {
@@ -264,6 +268,12 @@ body {
 
 #theme_toggle:hover {
     opacity: 1;
+}
+
+#theme_toggle:focus-visible {
+    outline: 2px solid var(--blue);
+    outline-offset: 2px;
+    border-radius: 4px;
 }
 
 #theme_toggle svg {

@@ -34,9 +34,10 @@ function renderThemeIcon() {
     } else {
         isDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
     }
+    btn.setAttribute("aria-pressed", String(isDark));
     btn.innerHTML = isDark
-        ? hb.getSvg("sun_icon", { class_string: "theme_icon" })
-        : hb.getSvg("moon_icon", { class_string: "theme_icon" });
+        ? hb.getSvg("sun_icon", {})
+        : hb.getSvg("moon_icon", {});
 }
 
 function fk_theme_get() {
