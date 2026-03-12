@@ -52,10 +52,15 @@ function initPrf(cb) {
                 prfToWebWorkerKey(prf_buff, function() {
                     genDefaultSeed(cb);
                     active_prf = true;
-                    var html_string = "<span>Filekey authenticated. Now drag and drop files to encrypt or decrypt them!</span>";
+                    var html_string = "<span>Filekey authenticated. Now drag and drop files to encrypt or decrypt them! · </span><span class=msg_clickable id=clickable_share_key>Share Key</span>";
+                    var auth_events_obj = {
+                        clickable_share_key: {
+                            target: displayPublicKey
+                        },
+                    };
                     htmlWriter({
                         char_speed: 8
-                    }, html_string, main_inner);
+                    }, html_string, main_inner, auth_events_obj);
                     document.getElementById("drop_container").style.display = "flex";
                     scrollToBottom();
                 });
