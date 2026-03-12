@@ -64,12 +64,6 @@ function initChizMenu() {
                 content: `<h3 class=msg_number_heading>No Data Collection:</h3><span>We do not collect, store, or process any personal information on the website—no names, emails, or accounts. We do not track you, and we do not use analytics.</span><h3 class=msg_number_heading>Local-Only File Handling:</h3><span>All file encryption and decryption happens entirely on your device. We never send your files or keys to our servers. You remain in full control of your data at all times.</span><h3 class=msg_number_heading>Local Storage:</h3><span>We may use local storage on your device to remember your settings or key references. This information never leaves your device.</span><h3 class=msg_number_heading>No Third Parties:</h3><span>We do not share any data with third parties. There are no hidden integrations or external services.</span><h3 class=msg_number_heading>Changes to This Policy:</h3><span>If we make changes, we will update this page. Your continued use of FileKey means you accept the updated terms.</span><h3 class=msg_number_heading>Contact Us:</h3><span>If you have questions or concerns, please visit our </span><a class=msg_link href=https://github.com/jacaudi/filekey/issues target=_blank>GitHub Issues</a><span> page.</span><br/><span>By using FileKey, you agree to this policy.</span>`
             });
             return;
-        case "chiz_license":
-            modal_h.open({
-                title: "License",
-                content: `{{LICENSE_CONTENT}}`
-            });
-            return;
         }
     }
 }
