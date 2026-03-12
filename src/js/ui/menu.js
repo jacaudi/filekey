@@ -43,9 +43,6 @@ function initChizMenu() {
         case "chiz_clear_all":
             clearAll();
             return;
-        case "chiz_get_public_key":
-            displayPublicKey();
-            return;
         case "chiz_how_it_works":
             modal_h.open({
                 title: "How FileKey Works",
