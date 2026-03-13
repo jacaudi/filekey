@@ -165,7 +165,7 @@ pubKeyBytes.set(yBytes, 67);
 const pkcs8=buildPKCS8WithPublicKey(privKeyBytes, pubKeyBytes);
 crypto.subtle.importKey( "pkcs8", pkcs8.buffer, {
 name: "ECDH", namedCurve: "P-521" }
-, true, ["deriveKey", "deriveBits"] ).then(function(key) {
+, false, ["deriveKey", "deriveBits"] ).then(function(key) {
 inner_cb({
 success: true, key, pkcs8Buffer: pkcs8.buffer }
 );
@@ -202,7 +202,7 @@ rawPublicKey.set(yBytes, 67);
 try {
 crypto.subtle.importKey( "raw", rawPublicKey.buffer, {
 name: "ECDH", namedCurve: "P-521" }
-, true, [] ).then(function(key){
+, false, [] ).then(function(key){
 inner_cb({
 success: true, key, rawBuffer: rawPublicKey.buffer }
 );
