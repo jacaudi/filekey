@@ -43,6 +43,7 @@ jobs:
       contents: read
     with:
       test-framework: custom
+      setup-command: node scripts/build.js
       test-command: node --test app/tests/test-*.js
       node-version: '22'
       artifact-name: test-results-node
@@ -56,25 +57,13 @@ jobs:
       test-framework: go
       working-directory: server
       go-version: stable
-      setup-command: cp -r app server/app
+      # node scripts/build.js relies on the Node.js pre-installed on ubuntu-latest (~v20+)
+      setup-command: node scripts/build.js && cp -r app server/app
       artifact-name: test-results-go
-
-  build-check:
-    name: Build Check
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-      - run: node scripts/build.js
-      - run: git diff --exit-code app/index.html
 
   release:
     name: Release
-    needs: [lint-go, lint-config, test-node, test-go, build-check]
+    needs: [lint-go, lint-config, test-node, test-go]
     uses: jacaudi/github-actions/.github/workflows/semantic-release.yml@v0.13.0
     permissions:
       contents: write

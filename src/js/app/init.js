@@ -45,6 +45,7 @@ function domInit() {
     initLogo();
     initDropContainer();
     initChizMenu();
+    initTheme();
     memTest();
     var font_h = new font_handler();
     font_h.fontLoader(['/fonts/inter_variable.ttf', ], {
