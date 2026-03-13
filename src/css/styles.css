@@ -251,6 +251,10 @@ body {
 
 #chiz_container {
     right: 0;
+    flex-direction: row;
+    justify-content: flex-end;
+    padding-right: 24px;
+    gap: 12px;
 }
 
 #theme_toggle {
@@ -296,6 +300,7 @@ body {
 
 #logo_bar {
     display: flex;
+    align-items: center;
     cursor: pointer;
 }
 
@@ -303,7 +308,10 @@ body {
     color: var(--text);
     font-size: 26px;
     font-family: sans-serif;
+    line-height: 1;
     margin-left: 8px;
+    position: relative;
+    top: 3px;
 }
 
 #outer_drop_container {
@@ -540,7 +548,9 @@ body {
 }
 
 #chiz_menu_container {
-    position: relative;
+    position: absolute;
+    top: 100%;
+    right: 24px;
     display: none;
     z-index: 1010;
 }
