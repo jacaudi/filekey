@@ -21,17 +21,16 @@ describe('ECDH key non-extractable (#36)', function() {
         );
     });
 
-    it('ecdh.js public key importKey does not use extractable: true', function() {
+    it('no ECDH importKey call uses extractable: true', function() {
         assert.ok(
-            !html.includes('rawPublicKey.buffer, { name: "ECDH", namedCurve: "P-521" } , true, []'),
-            'ECDH public key (ecdh.js convertPublicKeyToRaw) must not use extractable: true'
+            !html.includes('namedCurve: "P-521" } , true,'),
+            'No ECDH importKey call may use extractable: true'
         );
     });
 
-    it('ecdh.js public key importKey uses extractable: false', function() {
-        assert.ok(
-            html.includes('rawPublicKey.buffer, { name: "ECDH", namedCurve: "P-521" } , false, []'),
-            'ECDH public key (ecdh.js convertPublicKeyToRaw) must use extractable: false'
-        );
+    it('all ECDH importKey calls use extractable: false', function() {
+        // Verify no remaining true patterns
+        const trueMatches = (html.match(/namedCurve: "P-521" } , true,/g) || []).length;
+        assert.strictEqual(trueMatches, 0, 'No ECDH importKey should use extractable: true');
     });
 });
