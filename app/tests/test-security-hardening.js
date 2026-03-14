@@ -62,4 +62,18 @@ describe('Filename sanitization (#37)', function() {
             'download_ab must call sanitizeFilename'
         );
     });
+
+    it('sanitizeFilename strips path separators and null bytes', function() {
+        const idx = html.indexOf('function sanitizeFilename(');
+        assert.ok(idx !== -1, 'sanitizeFilename must exist');
+        const body = html.slice(idx, idx + 300);
+        assert.ok(
+            body.includes("replace(/[/\\\\]/g,'')") || body.includes("replace(/[/\\\\]/g, '')"),
+            'must strip slashes'
+        );
+        assert.ok(
+            body.includes("replace(/\\x00/g,'')") || body.includes("replace(/\\x00/g, '')"),
+            'must strip null bytes'
+        );
+    });
 });
