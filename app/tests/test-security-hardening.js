@@ -34,3 +34,32 @@ describe('ECDH key non-extractable (#36)', function() {
         assert.strictEqual(trueMatches, 0, 'No ECDH importKey should use extractable: true');
     });
 });
+
+describe('Filename sanitization (#37)', function() {
+    it('sanitizeFilename function is present in built output', function() {
+        assert.ok(
+            html.includes('function sanitizeFilename('),
+            'sanitizeFilename must be defined in built output'
+        );
+    });
+
+    it('sanitizeFilename truncates to 255 characters', function() {
+        const idx = html.indexOf('function sanitizeFilename(');
+        assert.ok(idx !== -1, 'sanitizeFilename must exist');
+        const body = html.slice(idx, idx + 300);
+        assert.ok(
+            body.includes('.slice(0,255)') || body.includes('.slice(0, 255)'),
+            'sanitizeFilename must truncate to 255 chars'
+        );
+    });
+
+    it('download_ab calls sanitizeFilename', function() {
+        const idx = html.indexOf('function download_ab(');
+        assert.ok(idx !== -1, 'download_ab must exist');
+        const body = html.slice(idx, idx + 500);
+        assert.ok(
+            body.includes('sanitizeFilename('),
+            'download_ab must call sanitizeFilename'
+        );
+    });
+});
