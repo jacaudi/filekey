@@ -4,7 +4,6 @@ import (
 	"io/fs"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"strings"
 	"testing"
 )
@@ -15,49 +14,11 @@ func makeHandler(t *testing.T) http.Handler {
 	if err != nil {
 		t.Fatalf("failed to create sub FS: %v", err)
 	}
-	indexBytes, err := fs.ReadFile(appFS, "index.html")
+	indexContent, err := prepareIndexContent(appFS)
 	if err != nil {
 		t.Fatalf("failed to read embedded index.html: %v", err)
 	}
-	indexContent := strings.Replace(string(indexBytes), "__APP_VERSION__", Version, 1)
-	if os.Getenv("FK_DEBUG") == "true" {
-		indexContent = strings.ReplaceAll(indexContent, "let FK_DEBUG = false", "let FK_DEBUG = true")
-	}
-	fileServer := http.FileServer(http.FS(appFS))
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("X-Frame-Options", "DENY")
-		w.Header().Set("X-Content-Type-Options", "nosniff")
-		w.Header().Set("Referrer-Policy", "strict-origin-when-cross-origin")
-		w.Header().Set("Permissions-Policy", "camera=(), microphone=(), geolocation=()")
-		w.Header().Set("Strict-Transport-Security", "max-age=63072000; includeSubDomains")
-		w.Header().Set("Content-Security-Policy",
-			"default-src 'self'; "+
-				"script-src 'self' 'unsafe-inline'; "+
-				"style-src 'self' 'unsafe-inline'; "+
-				"img-src 'self' data:; "+
-				"font-src 'self'; "+
-				"connect-src 'self'; "+
-				"manifest-src 'self'; "+
-				"worker-src 'self' blob:; "+
-				"form-action 'none'; "+
-				"base-uri 'self'")
-
-		switch r.URL.Path {
-		case "/sw.js":
-			w.Header().Set("Cache-Control", "no-store")
-			w.Header().Set("Service-Worker-Allowed", "/")
-		case "/", "/index.html":
-			w.Header().Set("Cache-Control", "no-cache")
-			w.Header().Set("Content-Type", "text/html; charset=utf-8")
-			w.Write([]byte(indexContent))
-			return
-		case "/manifest.json":
-			w.Header().Set("Cache-Control", "no-cache")
-		default:
-			w.Header().Set("Cache-Control", "public, max-age=31536000, immutable")
-		}
-		fileServer.ServeHTTP(w, r)
-	})
+	return buildHandler(indexContent)
 }
 
 func TestVersionInjection(t *testing.T) {
