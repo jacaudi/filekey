@@ -1,3 +1,4 @@
+// Embedded in both main-thread and worker bundles. Keep DOM-free.
 function buffer_helper() {
     this.bufferToHex = bufferToHex;
     this.hexStringToHexNumber = hexStringToHexNumber;

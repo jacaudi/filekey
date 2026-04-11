@@ -62,11 +62,16 @@ describe('Build system (Issue #27)', () => {
             'src/js/worker/debug.js must exist');
     });
 
-    it('all 6 worker source files exist', { skip: !hasFullRepo && 'requires full repo access' }, () => {
-        for (const f of ['debug.js', 'index.js', 'encryption.js', 'buffer.js', 'keccak.js', 'ecdh.js']) {
+    it('all 5 worker source files exist', { skip: !hasFullRepo && 'requires full repo access' }, () => {
+        for (const f of ['debug.js', 'index.js', 'encryption.js', 'keccak.js', 'ecdh.js']) {
             assert.ok(fs.existsSync(path.join(srcDir, 'js', 'worker', f)),
                 `src/js/worker/${f} must exist`);
         }
+    });
+
+    it('lib/buffer.js exists (shared with worker bundle)', { skip: !hasFullRepo && 'requires full repo access' }, () => {
+        assert.ok(fs.existsSync(path.join(srcDir, 'js', 'lib', 'buffer.js')),
+            'src/js/lib/buffer.js must exist (shared by main-thread + worker bundles)');
     });
 
     it('build script produces valid output', { skip: !hasFullRepo && 'requires full repo access' }, () => {
@@ -86,8 +91,8 @@ describe('Build system (Issue #27)', () => {
         const enc = fs.readFileSync(path.join(srcDir, 'js', 'worker', 'encryption.js'), 'utf8');
         assert.ok(enc.includes('ww_encryption_handler'), 'encryption.js must contain ww_encryption_handler');
 
-        const buf = fs.readFileSync(path.join(srcDir, 'js', 'worker', 'buffer.js'), 'utf8');
-        assert.ok(buf.includes('buffer_helper'), 'buffer.js must contain buffer_helper');
+        const buf = fs.readFileSync(path.join(srcDir, 'js', 'lib', 'buffer.js'), 'utf8');
+        assert.ok(buf.includes('buffer_helper'), 'lib/buffer.js must contain buffer_helper');
 
         const kec = fs.readFileSync(path.join(srcDir, 'js', 'worker', 'keccak.js'), 'utf8');
         assert.ok(kec.includes('keccak_handler'), 'keccak.js must contain keccak_handler');
