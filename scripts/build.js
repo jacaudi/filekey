@@ -3,6 +3,7 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
+const { stripComments } = require('./strip-comments.js');
 
 const ROOT = path.join(__dirname, '..');
 const SRC = path.join(ROOT, 'src');
@@ -30,9 +31,10 @@ const workerParts = WORKER_FILES.map(f =>
     fs.readFileSync(path.join(SRC, 'js', 'worker', f), 'utf8')
 );
 
-// Minify worker: strip // comments (they break single-line output), then collapse whitespace
-const workerBlob = workerParts.join('\n')
-    .replace(/\/\/.*$/gm, '')   // remove single-line comments before collapsing newlines
+// Minify worker: strip // and /* */ comments in a string-literal-aware way so
+// URL literals and other strings containing `//` are preserved (issues #45, #38).
+// Then collapse whitespace for the single-line worker blob.
+const workerBlob = stripComments(workerParts.join('\n'))
     .replace(/\s+/g, ' ')
     .trim();
 
