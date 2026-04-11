@@ -2,9 +2,7 @@ function getRandomEleId() {
     return ("misc_msg_" + misc_msg_counter++);
 }
 function loadSecKey() {
-    setPrfIfNot(function(ret) {
-        var qq = 22;
-    });
+    setPrfIfNot(function(ret) {});
 }
 function shareEnc(data, cb) {
     var msg_buff = data;
@@ -80,24 +78,9 @@ function initDropContainer() {
 }
 
 function genDefaultSeed(cb) {
-    let allow_gen = true;
-    (function generateAnotherOne(e) {
-        if (allow_gen) {
-            var suffix = "";
-            var new_seed_count = 0;
-            allow_gen = false;
-            var seed_name = (suffix + "_" + new_seed_count++);
-            setNewSeed(seed_name, function() {
-                cb(true);
-            });
-        }
-    }
-    )();
-    function displayButtons() {
-        new_seed.style.display = "inline-block";
-        clear_all.style.display = "inline-block";
-        gen_prf_input.style.display = "inline-block";
-    }
+    setNewSeed("_0", function() {
+        cb(true);
+    });
 }
 function combineArrayBuffers(buffer1, buffer2) {
     const combinedBuffer = new ArrayBuffer(buffer1.byteLength + buffer2.byteLength);
@@ -105,10 +88,6 @@ function combineArrayBuffers(buffer1, buffer2) {
     combinedView.set(new Uint8Array(buffer1), 0);
     combinedView.set(new Uint8Array(buffer2), buffer1.byteLength);
     return combinedBuffer;
-}
-function deselectLastActiveAccount() {
-    if (last_active_account != null)
-        last_active_account.style.opacity = "1";
 }
 function prfToWebWorkerKey(prf_buff, cb) {
     var msg_param = {
@@ -125,26 +104,12 @@ function setNewSeed(seed_name, cb) {
     ww_h.sendMessageToWorker(msg_param, [], cb);
 }
 function encNewMsg(msg_data, cb) {
-    var msg_buff;
-    if (file_as_text)
-        msg_buff = msg_data;
-    else
-        msg_buff = stringToArrayBuffer(msg_data);
+    var msg_buff = msg_data;
     var msg_param = {
         msg_type: "new_enc",
         msg_buff
     };
     ww_h.sendMessageToWorker(msg_param, [msg_buff], cb);
-}
-function stringToArrayBuffer(str) {
-    const buffer = new Uint8Array(str.length);
-    for (let i = 0; i < str.length; i++) {
-        buffer[i] = str.charCodeAt(i);
-    }
-    return buffer.buffer;
-}
-function leaveItAlone(already_as_needed) {
-    return already_as_needed;
 }
 function decMsg(msg_buff, cb) {
     var msg_param = {
@@ -222,41 +187,5 @@ function genIdConfirmHash(file_buff) {
     }
     function floorLog2(x) {
         return Math.floor(Math.log(x) / Math.log(2));
-    }
-}
-function useBiometricsErrorHandler(error_value) {
-    var error_obj;
-    switch (error_value) {
-    case "no_prf":
-        error_obj = {
-            msg_html: "Invalid passkey, or unsupported device.",
-            full_bar_target: true,
-            self_remove_ms: 8000,
-            custom_bg_color: "#e93232",
-            custom_color: "#fff",
-            svg_icon: hb.getSvg("warning_w_border", {
-                class_string: "std_icon"
-            }),
-            close_icon: hb.getSvg("x", {
-                class_string: "std_close_icon"
-            })
-        };
-        break;
-    case "no_stored_pk":
-    default:
-        error_obj = {
-            msg_html: "No account detected.",
-            full_bar_target: true,
-            self_remove_ms: 8000,
-            custom_bg_color: "#500202",
-            custom_color: "#fff",
-            svg_icon: hb.getSvg("warning_w_border", {
-                class_string: "std_icon"
-            }),
-            close_icon: hb.getSvg("x", {
-                class_string: "std_close_icon"
-            })
-        };
-        break;
     }
 }

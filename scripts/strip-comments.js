@@ -1,45 +1,15 @@
 'use strict';
 
-// String-literal-aware JavaScript comment stripper.
-//
-// Removes `// line` and `/* block */` comments while leaving string literals
-// (double, single, and template) untouched -- including URLs that contain `//`.
-// This replaces a naive `/\/\/.*$/gm` regex that would silently mangle any line
-// containing `//` inside a string (see issues #45 and #38).
-//
-// Not a full JS parser. It handles the shapes that actually appear in
-// src/js/worker/*.js today:
-//   - // line comments
-//   - /* block comments */ (single- and multi-line)
-//   - "..." and '...' strings with \-escapes
-//   - `...` template literals (${...} interpolations with nested braces)
-//   - regex literals /.../flags (best-effort disambiguation from division)
-// Pathological inputs (unterminated string or block comment) do not throw --
-// they consume to EOF.
+// String-literal-aware JS comment stripper. Preserves `//` inside string and
+// template literals, regex literals, and escapes. Not a full parser.
 
-/**
- * @param {string} src
- * @returns {string}
- */
 function stripComments(src) {
-    if (typeof src !== 'string') {
-        throw new TypeError('stripComments: src must be a string');
-    }
     const n = src.length;
     let out = '';
     let i = 0;
-    // `prevSignificant` tracks the last non-whitespace, non-comment character
-    // we emitted. We use it to decide whether a `/` begins a regex literal or
-    // a division operator. Rough heuristic: after an operator/keyword-like
-    // position, `/` starts a regex; after an identifier/number/)/], it's
-    // division. We start in "regex position".
     let prevSignificant = '';
 
     const isRegexContext = () => {
-        // Regex is allowed at the start of input or after these characters.
-        // Division is expected after identifiers, numbers, `)`, `]`, `}` (in
-        // expression position) and string/template closers. We conservatively
-        // treat `}` as division context; that's fine for our worker sources.
         if (prevSignificant === '') return true;
         return !/[A-Za-z0-9_$)\]}'"`]/.test(prevSignificant);
     };
@@ -69,7 +39,6 @@ function stripComments(src) {
             }
             // Emit a single space so tokens on either side don't fuse.
             out += ' ';
-            prevSignificant = ' ';
             continue;
         }
 

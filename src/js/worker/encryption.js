@@ -26,21 +26,6 @@ cb(decrpyted_stuff);
 cb(null) }
 );
 }
-this.hexToArrayBuffer=hexToArrayBuffer;
-function hexToArrayBuffer(hex_str, buffer_type=null){
-const regex=new RegExp(/0x/i);
-if(regex.test(hex_str.substring(0,2))) hex_str=hex_str.substring(2);
-var ret=[];
-for(var i=0;
-i < hex_str.length/2;
-i++){
-var x=i*2;
-const n=parseInt(hex_str.substr(x, 2), 16);
-ret.push(n);
-}
-if(buffer_type) return new buffer_type(ret);
-else return ret;
-}
 this.deriveEcdhKey=deriveEcdhKey;
 function deriveEcdhKey(privateKey, publicKey, callback) {
 self.crypto.subtle.deriveKey( {

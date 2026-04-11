@@ -45,7 +45,6 @@ function setFileImport() {
         function setDragContainer(e) {
             preventDefaults(e);
             setCurrentCursor(e, 'none');
-            var qq = 22;
             drag_window.style.display = "block";
             file_drag_zone.style.display = "block";
             file_drag_zone.addEventListener("dragenter", enteredFileDragZone);
@@ -64,14 +63,9 @@ function setFileImport() {
             if (e.fromElement == null)
                 removeDragContainer();
         }
-        function removeDragEvents() {
-            preventDefaults(e);
-            removeDragContainer();
-        }
         function doNothing(e) {
             preventDefaults(e);
             setCurrentCursor(e, current_cursor);
-            var qq = 22;
         }
         function setCurrentCursor(e, type='copy') {
             current_cursor = type;
@@ -79,14 +73,12 @@ function setFileImport() {
         }
         function droppedFile(e) {
             preventDefaults(e);
-            var qq = 22;
             removeDragContainer();
             unhighlight(e);
             if (e.target === file_drag_zone)
                 handleDrop(e);
         }
         function removeDragContainer() {
-            var qq = 22;
             drag_window.style.display = "none";
             file_drag_zone.style.display = "none";
         }
@@ -102,11 +94,6 @@ function setFileImport() {
             drop_border_obj.toggleAnimation(false);
             active_border_animation = false;
             fk_log('debug', 'file', 'drag unhighlight');
-        }
-        function handleDropAnimation(e) {
-            preventDefaults(e);
-            unhighlight(e);
-            handleDrop(e);
         }
     }
     function handleDrop(e) {
@@ -146,11 +133,9 @@ function setFileImport() {
         );
     }
     function addFileToList(new_file) {
-        var qq_add = 22;
         file_array.push(new_file);
     }
     function setFileArrayList() {
-        var qq_add = 22;
         current_active_file_array = file_array;
     }
     function setImportButtons() {
@@ -158,7 +143,6 @@ function setFileImport() {
             document.getElementById('file_input').click();
         });
         document.getElementById('file_input').addEventListener('change', function(event) {
-            const files = event.target.files;
             setFileList(event.target.files);
             handleNewFiles();
         });
@@ -200,9 +184,6 @@ function handleNewFiles() {
             doStuff();
         }
     }
-}
-function sanitizeFilename(file_name) {
-    return file_name.replace(/[/\\]/g, '').replace(/\x00/g, '').slice(0, 255);
 }
 function download_ab(file_name, array_buff) {
     const blob = new Blob([array_buff],{

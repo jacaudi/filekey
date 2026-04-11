@@ -2,8 +2,6 @@ function webauthn_handler(init_params={
     name: "BitNote",
     id: "bitnote.xyz"
 }) {
-    (function init() {}
-    )();
     this.createCredential = createCredential;
     function createCredential(prf_obj, callback) {
         navigator.credentials.create({
@@ -44,12 +42,11 @@ function webauthn_handler(init_params={
                 callback(null);
         }
         ).catch( (error) => {
-            var qq = 22;
             callback(null);
         }
         );
     }
-    this.getCredential = getCredential;
+    this.webAuthnClick = getCredential;
     function getCredential(prf_obj, callback) {
         var publicKey = {
             timeout: 60000,
@@ -76,37 +73,14 @@ function webauthn_handler(init_params={
         }).then( (c) => {
             var ext_results = c.getClientExtensionResults();
             if (checkForProperty(ext_results) && checkForProperty(ext_results.prf.results) && checkForProperty(ext_results.prf.results.first) && checkForProperty(ext_results.prf.results.second)) {
-                var key_mat = concatArrayBuffers(ext_results.prf.results.first, ext_results.prf.results.second);
+                var key_mat = combineArrayBuffers(ext_results.prf.results.first, ext_results.prf.results.second);
                 callback(key_mat, c.rawId);
             } else
                 callback(null);
         }
         ).catch( (error) => {
-            var qq = 22;
             callback(null);
         }
         );
-    }
-    function concatArrayBuffers(buffer1, buffer2) {
-        var tmp = new Uint8Array(buffer1.byteLength + buffer2.byteLength);
-        tmp.set(new Uint8Array(buffer1), 0);
-        tmp.set(new Uint8Array(buffer2), buffer1.byteLength);
-        return tmp.buffer;
-    }
-    this.webAuthnClick = webAuthnClick;
-    function webAuthnClick(prf_obj, bio_cb) {
-        getCredential(prf_obj, bio_cb);
-        function handleBioLogin(key_mat, raw_id) {
-            if (key_mat != null && raw_id != null) {
-                getBiometrics(raw_id, handleLogin);
-            } else
-                bio_cb(null);
-            function handleLogin(cred) {
-                bio_cb(key_mat, cred);
-            }
-        }
-    }
-    function checkForProperty(prop) {
-        return (prop === "" || prop === null || prop === undefined) ? false : true;
     }
 }

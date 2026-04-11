@@ -6,7 +6,7 @@ const path = require('path');
 
 const html = fs.readFileSync(path.join(__dirname, '../index.html'), 'utf8');
 
-describe('ECDH key non-extractable (#36)', function() {
+describe('ECDH key non-extractable', function() {
     it('private key importKey does not use extractable: true', function() {
         assert.ok(
             !html.includes(', true, ["deriveKey"'),
@@ -29,13 +29,12 @@ describe('ECDH key non-extractable (#36)', function() {
     });
 
     it('all ECDH importKey calls use extractable: false', function() {
-        // Verify no remaining true patterns
         const trueMatches = (html.match(/namedCurve: "P-521" } , true,/g) || []).length;
         assert.strictEqual(trueMatches, 0, 'No ECDH importKey should use extractable: true');
     });
 });
 
-describe('Filename sanitization (#37)', function() {
+describe('Filename sanitization', function() {
     it('sanitizeFilename function is present in built output', function() {
         assert.ok(
             html.includes('function sanitizeFilename('),

@@ -231,7 +231,7 @@ function handleSharedFile(file_obj) {
                         htmlWriter(params, html_string, main_inner);
                     } else {
                         var new_filename = filename.replace(".shared_filekey", "");
-                        newDownloadObj(new_filename, decodeData(ret.decrypted_buff), {
+                        newDownloadObj(new_filename, ret.decrypted_buff, {
                             encrypt_status,
                             shared_file: true
                         }, function(ret) {
@@ -257,7 +257,7 @@ function undoStuff() {
         status_obj = setStatusMsg(encrypt_status);
         status_obj.animator = new set3dotStatusAnimation(status_obj);
         (function nextFile(file) {
-            parseFilekeyFile(file, function(file_contents, filename) {
+            getFlatFile(file, function(file_contents, filename) {
                 decMsg(file_contents, function(ret) {
                     if (ret === null) {
                         status_obj.animator.clearStatus();
@@ -266,7 +266,7 @@ function undoStuff() {
                         htmlWriter(params, html_string, main_inner);
                     } else {
                         var new_filename = filename.replace(".filekey", "");
-                        newDownloadObj(new_filename, decodeData(ret.decrypted_buff), {
+                        newDownloadObj(new_filename, ret.decrypted_buff, {
                             encrypt_status
                         }, function(ret) {
                             scrollForFirstFile(fc);
@@ -337,30 +337,6 @@ function set3dotStatusAnimation(status_obj) {
             status_ele.innerText = status_obj.status_msg + "... Done!";
             status_obj = null;
         }
-    }
-}
-function decodeData(decoded_data) {
-    if (file_as_text) {
-        var ret = leaveItAlone(decoded_data);
-        return ret;
-    } else {
-        var ret = leaveItAlone(decoded_data);
-        return ret;
-    }
-}
-function parseFilekeyFile(file, cb) {
-    var filename = file.name;
-    if (checkForProperty(file.size)) {
-        readFile(file, function(ret) {
-            cb(ret, filename);
-        });
-    } else {
-        file.file(new_file => {
-            readFile(new_file, function(ret) {
-                cb(ret, filename);
-            });
-        }
-        );
     }
 }
 function doStuff() {

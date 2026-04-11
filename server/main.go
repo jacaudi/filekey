@@ -17,8 +17,6 @@ var staticFiles embed.FS
 // Version is set at build time via -ldflags="-X main.Version=<tag>"
 var Version = "dev"
 
-// prepareIndexContent reads the embedded index.html, injects the build-time
-// version, and applies the FK_DEBUG replacement when the env var is set.
 func prepareIndexContent(appFS fs.FS) (string, error) {
 	indexBytes, err := fs.ReadFile(appFS, "index.html")
 	if err != nil {
@@ -31,9 +29,6 @@ func prepareIndexContent(appFS fs.FS) (string, error) {
 	return indexContent, nil
 }
 
-// buildHandler constructs the HTTP handler that serves the embedded app. It
-// applies the shared security headers, CSP policy, and cache-control routing
-// used by both the production server and the test suite.
 func buildHandler(indexContent string) http.Handler {
 	appFS, err := fs.Sub(staticFiles, "app")
 	if err != nil {

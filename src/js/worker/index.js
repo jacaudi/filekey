@@ -1,16 +1,10 @@
-// Worker entry point. Build order in scripts/build.js matters:
-// this file is concatenated first; ww_encryption_handler, buffer_helper,
-// keccak_handler, and determineEcdh are defined in the files that follow.
 self.addEventListener("message", handleMessage);
 self.addEventListener("unhandledrejection", function(e) {
     fk_log('error', 'uncaught', 'unhandled rejection: ' + String(e.reason));
     self.postMessage(null);
 });
 let eh=new ww_encryption_handler();
-let active_mp_buff=null;
-let active_pk_buff=null;
 let active_ecdh_priv_key=null;
-let active_ecdh_pub_key=null;
 let shared_ecdh_pub_key=null;
 let secp_h;
 let kh=new keccak_handler();
@@ -48,13 +42,6 @@ genDetEcdh(active_seed);
 );
 break;
 case "get_det_public_ecdh": self.postMessage(active_det_ecdh_pub_buff);
-break;
-case "gen_seed_pk": var key=active_hkdf;
-generateAesFromHkdf(active_hkdf, function(ret){
-var salt1=ret.salt;
-var aes_key=ret.aes_key;
-}
-);
 break;
 case "new_enc": var key=active_hkdf;
 var msg_buff=msg_event.data.msg_buff;
@@ -136,11 +123,8 @@ case "clear_keys":
     active_seed = null;
     active_hkdf = null;
     active_ecdh_priv_key = null;
-    active_ecdh_pub_key = null;
     shared_ecdh_pub_key = null;
     active_det_ecdh_pub_buff = null;
-    active_mp_buff = null;
-    active_pk_buff = null;
     fk_log('debug', 'crypto', 'all keys cleared');
     self.postMessage(null);
     break;
@@ -158,7 +142,6 @@ return;
 }
 active_det_ecdh_pub_buff=result.publicKey.rawBuffer;
 active_ecdh_priv_key=result.privateKey.key;
-active_ecdh_pub_key=result.publicKey.key;
 }
 );
 }
@@ -213,8 +196,5 @@ aes_key, salt}
 fk_log('error', 'crypto', 'generateAesFromHkdf deriveKey failed: ' + e.toString());
 cb(null);
 });
-}
-function checkForProperty(prop){
-return (prop==="" || prop===null || prop===undefined) ? false : true;
 }
 }

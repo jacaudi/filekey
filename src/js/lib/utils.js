@@ -1,6 +1,9 @@
 function checkForProperty(prop) {
     return (prop === "" || prop === null || prop === undefined) ? false : true;
 }
+function sanitizeFilename(file_name) {
+    return file_name.replace(/[/\\]/g, '').replace(/\x00/g, '').slice(0, 255);
+}
 function getRandomInclusive(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }

@@ -145,8 +145,6 @@ function html_builder() {
             class_string: "dl_icon"
         })} </div></div></div></div> `;
     }
-    this.html_newShare = html_newShare;
-    function html_newShare(params={}) {}
     this.getSvg = getSvg;
     function getSvg(svg_name, params={}) {
         var id = "";
@@ -208,7 +206,6 @@ function html_builder() {
     }
 }
 
-var animated_list = [];
 var ex_params = [{
     stroke: {
         color: "#1377f980",
@@ -226,16 +223,6 @@ var ex_params = [{
         color: "#1377f980"
     },
 }, ];
-function toggleAnimations() {
-    for (var i = 0; i < animated_list.length; i++) {
-        animated_list[i].toggleAnimation();
-    }
-}
-function destroyAnimations() {
-    for (var i = 0; i < animated_list.length; i++) {
-        animated_list[i].destroy();
-    }
-}
 function createAnimatedBorder(element, params=null) {
     let svg, main_border, resize_observer, animation_handler, default_border;
     (function init() {
@@ -402,26 +389,6 @@ function copy_to_clipboard(text_to_copy, cb=null) {
     }
     );
 }
-function clear_clipboard(cb=null, params={}) {
-    let prefix = (params.prefix != null) ? params.prefix : "";
-    let suffix = (params.suffix != null) ? params.suffix : "";
-    let default_item_clear = (params.item_clear != null) ? params.item_clear : 40;
-    (function next(pointer) {
-        if (pointer < default_item_clear) {
-            navigator.clipboard.writeText(prefix + pointer + suffix).then(function() {
-                ++pointer;
-                window.setTimeout(function() {
-                    next(pointer)
-                }, 250);
-            });
-        } else if (cb != null) {
-            cb(true);
-            cb = null;
-        }
-    }
-    )(0);
-}
-
 function font_handler() {
     var loaded_obj = {};
     var styles = window.document.styleSheets[0];
@@ -453,9 +420,6 @@ function font_handler() {
         font_info.name = font_name[0];
         font_info.type = font_name[1];
         return font_info;
-    }
-    function checkForProperty(prop) {
-        return (prop === "" || prop === null || prop === undefined) ? false : true;
     }
 }
 
@@ -566,8 +530,5 @@ function topbar_ns_handler(settings={}) {
         return {
             clear: clearNotfication
         };
-    }
-    function checkForProperty(prop) {
-        return (prop === "" || prop === null || prop === undefined) ? false : true;
     }
 }

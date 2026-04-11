@@ -1,8 +1,5 @@
 'use strict';
 
-// Tests for the string-literal-aware comment stripper used by scripts/build.js.
-// See issues #45 (URL literal mangling) and #38 (block comments untouched).
-
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const path = require('node:path');

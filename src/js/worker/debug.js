@@ -1,6 +1,3 @@
-// Worker debug mode -- activated by FK_DEBUG=true environment variable on the server.
-// The server replaces 'let FK_DEBUG = false' with 'let FK_DEBUG = true' in both
-// the main thread and this worker blob at serve time.
 let FK_DEBUG = false;
 
 function fk_log(level, tag, msg, meta) {
