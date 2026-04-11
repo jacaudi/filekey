@@ -62,7 +62,7 @@ describe('Build system (Issue #27)', () => {
             'src/js/worker/debug.js must exist');
     });
 
-    it('all 5 worker source files exist', { skip: !hasFullRepo && 'requires full repo access' }, () => {
+    it('worker source files exist', { skip: !hasFullRepo && 'requires full repo access' }, () => {
         for (const f of ['debug.js', 'index.js', 'encryption.js', 'keccak.js', 'ecdh.js']) {
             assert.ok(fs.existsSync(path.join(srcDir, 'js', 'worker', f)),
                 `src/js/worker/${f} must exist`);
