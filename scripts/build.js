@@ -25,7 +25,11 @@ const mainJs = MAIN_FILES
 const WORKER_FILES = ['debug.js', 'index.js', 'encryption.js', 'buffer.js', 'keccak.js', 'ecdh.js'];
 const workerBlob = stripComments(
     WORKER_FILES
-        .map(f => fs.readFileSync(path.join(SRC, 'js', 'worker', f), 'utf8'))
+        .map(f => {
+            // buffer.js is shared with the main-thread bundle; source it from lib/ to avoid duplication.
+            const dir = (f === 'buffer.js') ? 'lib' : 'worker';
+            return fs.readFileSync(path.join(SRC, 'js', dir, f), 'utf8');
+        })
         .join('\n')
 )
     .replace(/\s+/g, ' ')
