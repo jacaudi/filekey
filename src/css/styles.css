@@ -241,16 +241,18 @@ body {
     align-items: center;
     justify-content: center;
     position: fixed;
-    width: 25%;
+    width: auto;
+    left: 25%;
+    right: 25%;
     flex-direction: column;
     top: 10px;
 }
 
 #logo_container {
+    align-items: flex-start;
 }
 
 #chiz_container {
-    right: 0;
     flex-direction: row;
     justify-content: flex-end;
     padding-right: 24px;
@@ -789,6 +791,8 @@ dialog.fk_modal::backdrop {
     #logo_container {
         width: auto;
         padding-left: 5vw;
+        left: 0;
+        right: auto;
     }
 
     #drop_container {
@@ -811,6 +815,8 @@ dialog.fk_modal::backdrop {
         z-index: 1101;
         padding-right: 16px;
         gap: 8px;
+        left: auto;
+        right: 0;
     }
 
     .pub_key_textarea_cont {
