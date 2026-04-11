@@ -1,7 +1,7 @@
 # =============================================================
 # Stage 1 — Download Inter Variable font
 # =============================================================
-FROM alpine AS fonts
+FROM alpine:3 AS fonts
 
 RUN apk add --no-cache curl unzip && \
     curl -fsSL "https://github.com/rsms/inter/releases/download/v4.0/Inter-4.0.zip" \

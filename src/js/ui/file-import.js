@@ -201,13 +201,16 @@ function handleNewFiles() {
         }
     }
 }
+function sanitizeFilename(file_name) {
+    return file_name.replace(/[/\\]/g, '').replace(/\x00/g, '').slice(0, 255);
+}
 function download_ab(file_name, array_buff) {
     const blob = new Blob([array_buff],{
         type: "application/octet-stream"
     });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.download = file_name;
+    link.download = sanitizeFilename(file_name);
     link.click();
     URL.revokeObjectURL(link.href);
 }

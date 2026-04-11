@@ -56,7 +56,7 @@ this.importEcdhPub=importEcdhPub;
 function importEcdhPub(pub_buff, cb){
 crypto.subtle.importKey( "raw", pub_buff, {
 name: "ECDH", namedCurve: "P-521" }
-, true, [] ).then(cb).catch(function(e){
+, false, [] ).then(cb).catch(function(e){
 fk_log('error', 'crypto', 'importEcdhPub failed: ' + e.toString());
 cb(null);
 });
