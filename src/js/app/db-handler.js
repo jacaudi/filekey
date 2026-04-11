@@ -14,7 +14,7 @@ function fk_db_handler(cb) {
         };
         main_handler = new database(db_name,[db_obj.data_store],version_number,function(valid) {
             if (!valid)
-                setPersistentWarning;
+                setPersistentWarning();
             else {
                 main_handler.getPersist(function(result) {
                     if (result)
@@ -106,18 +106,6 @@ function fk_db_handler(cb) {
                 if (cursor_cb != null)
                     cursor_cb(null);
             }
-        }
-        ;
-    }
-    this.openDbCursorWithKey = openDbCursorWithKey;
-    function openDbCursorWithKey(key) {
-        var store = main_handler.getStore(db_obj.data_store.name);
-        const request = store.openKeyCursor();
-        request.onsuccess = (event) => {
-            const cursor = event.target.result;
-            if (cursor) {
-                cursor.continue();
-            } else {}
         }
         ;
     }

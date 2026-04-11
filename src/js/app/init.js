@@ -3,16 +3,11 @@ let ww_h;
 let ww_script = null;
 let bh = new buffer_helper();
 let kh = new keccak_handler();
-let last_active_account = null;
 let current_active_file_array = [];
-let seed_bag = {};
 let active_prf = null;
 let active_send_pub = null;
 let active_share_prompt = null;
-let file_as_text = true;
-let dl_obj = {};
 let hb = new html_builder();
-let file_counter = 0;
 let misc_msg_counter = 0;
 let main_inner;
 let drop_border_obj;
@@ -20,10 +15,9 @@ let db_h;
 let tb_h = new topbar_ns_handler({
     z_index: 2139002000
 });
-let modal_h = new fk_modal_handler(); // Runs at parse time; requires <body> — works because <script> is inside <body>.
+let modal_h = new fk_modal_handler();
 let webauthn_h;
 let swc = null;
-let aes_auth_tag_byte_len = 16;
 window.addEventListener("DOMContentLoaded", domInit);
 function domInit() {
     main_inner = document.getElementById("main_inner");
@@ -183,8 +177,5 @@ function initWorkers() {
     ww_h.loadWorkerFromText(ww_js_script, storeAndWaitForWorker);
 }
 function initDB() {
-    db_h = new fk_db_handler(function(ret) {
-        var qq = 22;
-    }
-    );
+    db_h = new fk_db_handler(function(ret) {});
 }

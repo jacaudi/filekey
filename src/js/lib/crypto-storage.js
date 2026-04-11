@@ -1,27 +1,3 @@
-function compressor(text, compress=true, cb) {
-    var cs;
-    var enc_alg = "deflate-raw";
-    if (compress) {
-        cs = new CompressionStream(enc_alg);
-        text = new TextEncoder().encode(text);
-    } else
-        cs = new DecompressionStream(enc_alg);
-    const writer = cs.writable.getWriter();
-    writer.write(text);
-    writer.close();
-    const chunks = [];
-    const reader = cs.readable.getReader();
-    (function readNext() {
-        reader.read().then(function(result) {
-            if (!result.done) {
-                chunks.push(result.value);
-                readNext();
-            } else
-                cb((new Uint8Array(chunks.reduce( (acc, val) => acc.concat(Array.from(val)), []))).buffer);
-        });
-    }
-    )();
-}
 function database(db_name, stores, version_number, cb) {
     let db;
     (function openDatabase() {
@@ -70,13 +46,8 @@ function database(db_name, stores, version_number, cb) {
             db.transaction(store_name, 'readwrite').objectStore(store_name).clear();
         });
     }
-    this.clearDatabase = clearDatabase;
-    function clearDatabase(db_name) {
-        db.close();
-        window.indexedDB.deleteDatabase(db_name);
-    }
     this.getWriteableStore = getWriteableStore;
-    function getWriteableStore(store_name, cb) {
+    function getWriteableStore(store_name) {
         return db.transaction(store_name, 'readwrite').objectStore(store_name);
     }
     this.getKeyWithStore = getKeyWithStore;
@@ -95,7 +66,7 @@ function database(db_name, stores, version_number, cb) {
             });
         }
     }
-    this.getStore = function(store_name, cb) {
+    this.getStore = function(store_name) {
         return db.transaction(store_name, 'readonly').objectStore(store_name);
     }
     ;
@@ -122,9 +93,6 @@ function database(db_name, stores, version_number, cb) {
                 store: store
             });
         }
-    }
-    function checkForProperty(prop) {
-        return (prop === "" || prop === null || prop === undefined) ? false : true;
     }
 }
 
