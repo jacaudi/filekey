@@ -22,10 +22,13 @@ const mainJs = MAIN_FILES
     .map(f => fs.readFileSync(path.join(SRC, 'js', f), 'utf8'))
     .join('\n');
 
-const WORKER_FILES = ['debug.js', 'index.js', 'encryption.js', 'buffer.js', 'keccak.js', 'ecdh.js'];
+const WORKER_FILES = [
+    'worker/debug.js', 'worker/index.js', 'worker/encryption.js',
+    'lib/buffer.js', 'worker/keccak.js', 'worker/ecdh.js',
+];
 const workerBlob = stripComments(
     WORKER_FILES
-        .map(f => fs.readFileSync(path.join(SRC, 'js', 'worker', f), 'utf8'))
+        .map(f => fs.readFileSync(path.join(SRC, 'js', f), 'utf8'))
         .join('\n')
 )
     .replace(/\s+/g, ' ')
