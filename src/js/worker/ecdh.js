@@ -19,12 +19,12 @@ return ((a % m)*(b % m)) % m;
 }
 function modInv(a, m) {
 function egcd(a, b) {
-if (a===BigInt(0)) return [b, BigInt(0), BigInt(1)];
+if (a===0n) return [b, 0n, 1n];
 const [g, x, y]=egcd(b % a, a);
 return [g, y-(b/a)*x, x];
 }
 const [g, x, _]=egcd(a, m);
-if (g !==BigInt(1)) throw new Error("Modular inverse does not exist");
+if (g !==1n) throw new Error("Modular inverse does not exist");
 return ((x % m)+m) % m;
 }
 function isOnCurve(point) {
@@ -58,9 +58,9 @@ return result;
 }
 function pointDouble(P) {
 if (P===null) return null;
-if (P.y===BigInt(0)) return null;
-const slope=modMul( modAdd(modMul(BigInt(3), modMul(P.x, P.x, P521.P), P521.P), P521.A, P521.P), modInv(modMul(BigInt(2), P.y, P521.P), P521.P), P521.P );
-const x3=modSub(modMul(slope, slope, P521.P), modMul(BigInt(2), P.x, P521.P), P521.P);
+if (P.y===0n) return null;
+const slope=modMul( modAdd(modMul(3n, modMul(P.x, P.x, P521.P), P521.P), P521.A, P521.P), modInv(modMul(2n, P.y, P521.P), P521.P), P521.P );
+const x3=modSub(modMul(slope, slope, P521.P), modMul(2n, P.x, P521.P), P521.P);
 const y3=modSub(modMul(slope, modSub(P.x, x3, P521.P), P521.P), P.y, P521.P);
 const result={
 x: x3, y: y3 }
@@ -69,7 +69,7 @@ if (!isOnCurve(result)) throw new Error("Point doubling resulted in invalid poin
 return result;
 }
 function scalarMul(k, P) {
-if (k===BigInt(0)) return null;
+if (k===0n) return null;
 if (P===null) return null;
 let r0=null;
 let r1=P;
@@ -94,15 +94,15 @@ if (!(seed instanceof ArrayBuffer) || seed.byteLength !==64) {
 throw new Error("Seed must be a 64-byte ArrayBuffer");
 }
 const seedView=new Uint8Array(seed);
-let privateKey=BigInt(0);
+let privateKey=0n;
 for (let i=0;
 i < seedView.length;
 i++) {
-privateKey=(privateKey << BigInt(8)) | BigInt(seedView[i]);
+privateKey=(privateKey << 8n) | BigInt(seedView[i]);
 }
-const mask=(BigInt(1) << BigInt(521))-BigInt(1);
+const mask=(1n << 521n)-1n;
 privateKey=privateKey & mask;
-privateKey=(privateKey % (P521.N-BigInt(1)))+BigInt(1);
+privateKey=(privateKey % (P521.N-1n))+1n;
 const publicKey=scalarMul(privateKey, {
 x: P521.GX, y: P521.GY }
 );
@@ -145,24 +145,24 @@ let temp=privateKey;
 for (let i=privKeyBytes.length-1;
 i>=0;
 i--) {
-privKeyBytes[i]=Number(temp & BigInt(0xFF));
-temp=temp >> BigInt(8);
+privKeyBytes[i]=Number(temp & 0xFFn);
+temp=temp >> 8n;
 }
 const xBytes=new Uint8Array(66);
 let tempX=publicKey.x;
 for (let i=xBytes.length-1;
 i>=0;
 i--) {
-xBytes[i]=Number(tempX & BigInt(0xFF));
-tempX=tempX >> BigInt(8);
+xBytes[i]=Number(tempX & 0xFFn);
+tempX=tempX >> 8n;
 }
 const yBytes=new Uint8Array(66);
 let tempY=publicKey.y;
 for (let i=yBytes.length-1;
 i>=0;
 i--) {
-yBytes[i]=Number(tempY & BigInt(0xFF));
-tempY=tempY >> BigInt(8);
+yBytes[i]=Number(tempY & 0xFFn);
+tempY=tempY >> 8n;
 }
 const pubKeyBytes=new Uint8Array(133);
 pubKeyBytes[0]=0x04;
@@ -190,16 +190,16 @@ let tempX=publicKey.x;
 for (let i=xBytes.length-1;
 i >=0;
 i--) {
-xBytes[i]=Number(tempX & BigInt(0xFF));
-tempX=tempX >> BigInt(8);
+xBytes[i]=Number(tempX & 0xFFn);
+tempX=tempX >> 8n;
 }
 const yBytes=new Uint8Array(66);
 let tempY=publicKey.y;
 for (let i=yBytes.length-1;
 i >=0;
 i--) {
-yBytes[i]=Number(tempY & BigInt(0xFF));
-tempY=tempY >> BigInt(8);
+yBytes[i]=Number(tempY & 0xFFn);
+tempY=tempY >> 8n;
 }
 const rawPublicKey=new Uint8Array(133);
 rawPublicKey[0]=0x04;
