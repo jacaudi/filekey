@@ -96,32 +96,13 @@ function database(db_name, stores, version_number, cb) {
     }
 }
 
-function secureOverwriteBuffer(dataLength, useRandom=true, callback) {
-    if (!useRandom) {
-        const pattern = new Uint8Array([0xFF, 0x00, 0xFF, 0x00]);
-        const overwriteData = new Uint8Array(dataLength);
-        for (let i = 0; i < dataLength; i++) {
-            overwriteData[i] = pattern[i % pattern.length];
-        }
-        callback(overwriteData.buffer);
-    } else {
-        const chunkSize = 65536;
-        const overwriteData = new Uint8Array(dataLength);
-        let offset = 0;
-        function fillNextChunk() {
-            if (offset >= dataLength) {
-                callback(overwriteData.buffer);
-                return;
-            }
-            const remainingBytes = Math.min(chunkSize, dataLength - offset);
-            const chunk = new Uint8Array(remainingBytes);
-            self.crypto.getRandomValues(chunk);
-            overwriteData.set(chunk, offset);
-            offset += remainingBytes;
-            setTimeout(fillNextChunk, 0);
-        }
-        fillNextChunk();
+function secureOverwriteBuffer(dataLength, callback) {
+    const pattern = new Uint8Array([0xFF, 0x00, 0xFF, 0x00]);
+    const overwriteData = new Uint8Array(dataLength);
+    for (let i = 0; i < dataLength; i++) {
+        overwriteData[i] = pattern[i % pattern.length];
     }
+    callback(overwriteData.buffer);
 }
 function securelyDeleteFromStore(dbHandler, storeNames, callback) {
     if (!Array.isArray(storeNames)) {
@@ -152,7 +133,7 @@ function securelyDeleteFromStore(dbHandler, storeNames, callback) {
                     const recordToOverwrite = event.target.result;
                     if (recordToOverwrite && recordToOverwrite.data) {
                         const dataLength = recordToOverwrite.data.byteLength;
-                        secureOverwriteBuffer(dataLength, false, function(overwriteData) {
+                        secureOverwriteBuffer(dataLength, function(overwriteData) {
                             recordToOverwrite.data = overwriteData;
                             const putRequest = writeableStore.put(recordToOverwrite);
                             putRequest.onsuccess = function() {
