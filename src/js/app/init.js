@@ -51,7 +51,7 @@ function initVersionChecks() {
     setVersionNumber();
 }
 function initQueryChecks() {
-    var temp_qs = get_query_strings(false);
+    var temp_qs = get_query_strings();
     if (checkForProperty(temp_qs.pub))
         confirmAndAttachPub(temp_qs.pub, function(ret) {});
 }
