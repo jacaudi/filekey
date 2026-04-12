@@ -248,40 +248,58 @@ function handleSharedFile(file_obj) {
         )(file_array[fc++]);
     }
 }
-function undoStuff() {
-    var file_array = current_active_file_array;
-    if (file_array.length > 0) {
-        let fc = 0;
-        let encrypt_status = false;
-        let status_obj;
-        status_obj = setStatusMsg(encrypt_status);
-        status_obj.animator = new set3dotStatusAnimation(status_obj);
-        (function nextFile(file) {
-            getFlatFile(file, function(file_contents, filename) {
-                decMsg(file_contents, function(ret) {
-                    if (ret === null) {
-                        status_obj.animator.clearStatus();
-                        var params = getErrorParams();
-                        var html_string = "<span>Failed to unlock file with this key. Please try again.</span>";
-                        htmlWriter(params, html_string, main_inner);
-                    } else {
-                        var new_filename = filename.replace(".filekey", "");
-                        newDownloadObj(new_filename, ret.decrypted_buff, {
-                            encrypt_status
-                        }, function(ret) {
-                            scrollForFirstFile(fc);
-                            if (fc < file_array.length)
-                                nextFile(file_array[fc++]);
-                            else
-                                status_obj.animator.triggerStatusFinish(status_obj);
-                        });
-                    }
+const FILE_OPS = {
+    enc: {
+        work: encNewMsg,
+        transform: function(ret) { return combineArrayBuffers(ret.salt, ret.encrypted_buff); },
+        filename: function(name) { return name + '.filekey'; },
+        errorMsg: 'Failed to encrypt file. Please try again.',
+        encrypt_status: true,
+    },
+    dec: {
+        work: decMsg,
+        transform: function(ret) { return ret.decrypted_buff; },
+        filename: function(name) { return name.replace('.filekey', ''); },
+        errorMsg: 'Failed to unlock file with this key. Please try again.',
+        encrypt_status: false,
+    },
+};
+
+function processFileBatch(direction) {
+    const config = FILE_OPS[direction];
+    const file_array = current_active_file_array;
+    if (file_array.length === 0) return;
+    let fc = 0;
+    let status_obj = setStatusMsg(config.encrypt_status);
+    status_obj.animator = new set3dotStatusAnimation(status_obj);
+    (function nextFile(file) {
+        getFlatFile(file, function(file_contents, filename) {
+            config.work(file_contents, function(ret) {
+                if (ret === null) {
+                    status_obj.animator.clearStatus();
+                    var html_string = '<span>' + config.errorMsg + '</span>';
+                    htmlWriter(getErrorParams(), html_string, main_inner);
+                    return;
+                }
+                var out_buff = config.transform(ret);
+                var out_name = config.filename(filename);
+                newDownloadObj(out_name, out_buff, {
+                    encrypt_status: config.encrypt_status
+                }, function(ret) {
+                    scrollForFirstFile(fc);
+                    if (fc < file_array.length)
+                        nextFile(file_array[fc++]);
+                    else
+                        status_obj.animator.triggerStatusFinish(status_obj);
                 });
             });
-        }
-        )(file_array[fc++]);
-    }
+        });
+    })(file_array[fc++]);
 }
+
+function undoStuff() { processFileBatch('dec'); }
+
+function doStuff() { processFileBatch('enc'); }
 function getWarningParams() {
     return {
         char_speed: 2,
@@ -337,39 +355,5 @@ function set3dotStatusAnimation(status_obj) {
             status_ele.innerText = status_obj.status_msg + "... Done!";
             status_obj = null;
         }
-    }
-}
-function doStuff() {
-    var file_array = current_active_file_array;
-    if (file_array.length > 0) {
-        let fc = 0;
-        let encrypt_status = true;
-        let status_obj;
-        status_obj = setStatusMsg(encrypt_status);
-        status_obj.animator = new set3dotStatusAnimation(status_obj);
-        (function nextFile(file) {
-            getFlatFile(file, function(file_contents, filename) {
-                encNewMsg(file_contents, function(ret) {
-                    if (ret === null) {
-                        status_obj.animator.clearStatus();
-                        var html_string = "<span>Failed to encrypt file. Please try again.</span>";
-                        htmlWriter(getErrorParams(), html_string, main_inner);
-                        return;
-                    }
-                    var combined_buff = combineArrayBuffers(ret.salt, ret.encrypted_buff);
-                    var new_filename = filename + ".filekey";
-                    newDownloadObj(new_filename, combined_buff, {
-                        encrypt_status
-                    }, function(ret) {
-                        scrollForFirstFile(fc);
-                        if (fc < file_array.length)
-                            nextFile(file_array[fc++]);
-                        else
-                            status_obj.animator.triggerStatusFinish(status_obj);
-                    });
-                });
-            });
-        }
-        )(file_array[fc++]);
     }
 }
