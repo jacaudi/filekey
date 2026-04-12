@@ -267,7 +267,7 @@ const FILE_OPS = {
 
 function processFileBatch(direction) {
     const config = FILE_OPS[direction];
-    var file_array = current_active_file_array;
+    const file_array = current_active_file_array;
     if (file_array.length === 0) return;
     let fc = 0;
     let status_obj = setStatusMsg(config.encrypt_status);
