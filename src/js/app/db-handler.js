@@ -36,15 +36,6 @@ function fk_db_handler(cb) {
     function setPersistentWarning() {
         fk_log('warn', 'db', 'persistent storage unavailable, bookmark page to resolve');
     }
-    this.deleteKey = deleteKey;
-    function deleteKey(key, cb) {
-        main_handler.getKey([db_obj.data_store.name], key, function(ret) {
-            if (ret != null)
-                cb(ret.store.delete(key));
-            else
-                cb(null);
-        });
-    }
     this.getStore = getStore;
     function getStore(key, cb) {
         var store = main_handler.getStore(db_obj.data_store.name);
@@ -92,21 +83,5 @@ function fk_db_handler(cb) {
             } else
                 fk_log('warn', 'db', 'failed to save file: ' + file_id);
         });
-    }
-    this.cursorDataToFcn = cursorDataToFcn;
-    function cursorDataToFcn(params, cursor_cb=null) {
-        var store = main_handler.getStore(db_obj.data_store.name);
-        const request = store.openCursor();
-        request.onsuccess = (event) => {
-            const cursor = event.target.result;
-            if (cursor) {
-                cursor_cb(cursor);
-                cursor.continue();
-            } else {
-                if (cursor_cb != null)
-                    cursor_cb(null);
-            }
-        }
-        ;
     }
 }

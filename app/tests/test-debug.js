@@ -19,11 +19,6 @@ describe('Debug framework', () => {
         assert.ok(src.includes('function fk_log('), 'must define fk_log');
     });
 
-    it('lib/debug.js defines fk_safe_buf function', { skip: !hasFullRepo && 'skip' }, () => {
-        const src = fs.readFileSync(path.join(srcDir, 'js', 'lib', 'debug.js'), 'utf8');
-        assert.ok(src.includes('function fk_safe_buf('), 'must define fk_safe_buf');
-    });
-
     it('worker/debug.js defines FK_DEBUG as false', { skip: !hasFullRepo && 'skip' }, () => {
         const src = fs.readFileSync(path.join(srcDir, 'js', 'worker', 'debug.js'), 'utf8');
         assert.ok(src.includes('let FK_DEBUG = false'), 'worker FK_DEBUG must default to false');
@@ -34,11 +29,11 @@ describe('Debug framework', () => {
         assert.ok(html.includes('FK_DEBUG'), 'built index.html must contain FK_DEBUG');
     });
 
-    it('fk_safe_buf never returns raw buffer contents', { skip: !hasFullRepo && 'skip' }, () => {
-        const src = fs.readFileSync(path.join(srcDir, 'js', 'lib', 'debug.js'), 'utf8');
-        // fk_safe_buf should only return {type, byteLength} -- never buffer data
-        assert.ok(!src.includes('.buffer'), 'must not access .buffer property');
-        assert.ok(!src.includes('Uint8Array(buf)'), 'must not create typed array from buffer');
+    it('debug files do not define fk_safe_buf (deleted dead code)', { skip: !hasFullRepo && 'skip' }, () => {
+        for (const rel of [['lib', 'debug.js'], ['worker', 'debug.js']]) {
+            const src = fs.readFileSync(path.join(srcDir, 'js', ...rel), 'utf8');
+            assert.ok(!src.includes('fk_safe_buf'), rel.join('/') + ' must not define fk_safe_buf');
+        }
     });
 
     it('no raw console.log in main source files (only inside fk_log)', { skip: !hasFullRepo && 'skip' }, () => {

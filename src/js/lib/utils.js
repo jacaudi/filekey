@@ -4,9 +4,6 @@ function checkForProperty(prop) {
 function sanitizeFilename(file_name) {
     return file_name.replace(/[/\\]/g, '').replace(/\x00/g, '').slice(0, 255);
 }
-function getRandomInclusive(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-}
 function get_query_strings() {
     const results = {};
     for (const [key, raw] of new URLSearchParams(window.location.search)) {

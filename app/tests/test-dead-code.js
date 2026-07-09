@@ -37,4 +37,13 @@ describe('Dead code stays deleted (antd conversion phase 1, design §10.1)', () 
         assert.ok(!css.includes('action_icon_container'), 'styles.css must not style .action_icon_container');
         assert.ok(css.includes('.dl_icon'), '.dl_icon class must be KEPT (used by the Share icon)');
     });
+    it('dead utility functions are gone', { skip: !hasFullRepo && 'skip' }, () => {
+        assert.ok(!read('js/app/init.js').includes('sendSwMessage'), 'init.js must not define sendSwMessage');
+        assert.ok(!read('js/lib/debug.js').includes('fk_safe_buf'), 'lib/debug.js must not define fk_safe_buf');
+        assert.ok(!read('js/worker/debug.js').includes('fk_safe_buf'), 'worker/debug.js must not define fk_safe_buf');
+        assert.ok(!read('js/lib/utils.js').includes('getRandomInclusive'), 'utils.js must not define getRandomInclusive');
+        const db = read('js/app/db-handler.js');
+        assert.ok(!db.includes('cursorDataToFcn'), 'db-handler.js must not define cursorDataToFcn');
+        assert.ok(!db.includes('deleteKey'), 'db-handler.js must not define deleteKey');
+    });
 });
