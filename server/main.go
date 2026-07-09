@@ -30,12 +30,7 @@ func prepareIndexContent(appFS fs.FS) (string, error) {
 	return indexContent, nil
 }
 
-func buildHandler(indexContent string) http.Handler {
-	appFS, err := fs.Sub(staticFiles, "app")
-	if err != nil {
-		// Should be impossible given the //go:embed directive above.
-		panic(fmt.Sprintf("failed to create sub FS: %v", err))
-	}
+func buildHandler(appFS fs.FS, indexContent string) http.Handler {
 	fileServer := http.FileServer(http.FS(appFS))
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -109,7 +104,7 @@ func main() {
 		log.Fatalf("failed to read embedded index.html: %v", err)
 	}
 
-	http.Handle("/", buildHandler(indexContent))
+	http.Handle("/", buildHandler(appFS, indexContent))
 
 	addr := fmt.Sprintf(":%d", p)
 	log.Printf("FileKey listening on http://0.0.0.0%s", addr)

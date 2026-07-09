@@ -18,7 +18,7 @@ func makeHandler(t *testing.T) http.Handler {
 	if err != nil {
 		t.Fatalf("failed to read embedded index.html: %v", err)
 	}
-	return buildHandler(indexContent)
+	return buildHandler(appFS, indexContent)
 }
 
 func TestVersionInjection(t *testing.T) {
