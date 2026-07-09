@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 )
 
@@ -75,12 +76,27 @@ func buildHandler(indexContent string) http.Handler {
 	})
 }
 
+func parsePort(flagPort int, env string) (int, error) {
+	if env == "" {
+		return flagPort, nil
+	}
+	p, err := strconv.Atoi(env)
+	if err != nil {
+		return 0, fmt.Errorf("PORT must be an integer, got %q: %w", env, err)
+	}
+	if p < 1 || p > 65535 {
+		return 0, fmt.Errorf("PORT must be in 1..65535, got %d", p)
+	}
+	return p, nil
+}
+
 func main() {
 	port := flag.Int("port", 8080, "port to listen on")
 	flag.Parse()
 
-	if p := os.Getenv("PORT"); p != "" {
-		fmt.Sscanf(p, "%d", port)
+	p, err := parsePort(*port, os.Getenv("PORT"))
+	if err != nil {
+		log.Fatalf("invalid PORT: %v", err)
 	}
 
 	appFS, err := fs.Sub(staticFiles, "app")
@@ -95,7 +111,7 @@ func main() {
 
 	http.Handle("/", buildHandler(indexContent))
 
-	addr := fmt.Sprintf(":%d", *port)
+	addr := fmt.Sprintf(":%d", p)
 	log.Printf("FileKey listening on http://0.0.0.0%s", addr)
 	if err := http.ListenAndServe(addr, http.DefaultServeMux); err != nil {
 		log.Fatalf("server error: %v", err)

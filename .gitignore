@@ -1,3 +1,4 @@
 server/filekey
 .worktrees/
 app/index.html
+server/app/

@@ -167,3 +167,38 @@ func TestFKDebugEnabled(t *testing.T) {
 		t.Error("FK_DEBUG=true: response must contain 'let FK_DEBUG = true'")
 	}
 }
+
+func TestParsePort(t *testing.T) {
+	tests := []struct {
+		name     string
+		flagPort int
+		env      string
+		want     int
+		wantErr  bool
+	}{
+		{"empty env uses flag", 8080, "", 8080, false},
+		{"valid env overrides flag", 8080, "3000", 3000, false},
+		{"garbage fails", 8080, "abc", 0, true},
+		{"trailing junk fails (Sscanf regression)", 8080, "80abc", 0, true},
+		{"negative fails", 8080, "-1", 0, true},
+		{"zero fails", 8080, "0", 0, true},
+		{"too large fails", 8080, "70000", 0, true},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			got, err := parsePort(tc.flagPort, tc.env)
+			if tc.wantErr {
+				if err == nil {
+					t.Fatalf("parsePort(%d, %q): expected error, got %d", tc.flagPort, tc.env, got)
+				}
+				return
+			}
+			if err != nil {
+				t.Fatalf("parsePort(%d, %q): unexpected error: %v", tc.flagPort, tc.env, err)
+			}
+			if got != tc.want {
+				t.Errorf("parsePort(%d, %q) = %d, want %d", tc.flagPort, tc.env, got, tc.want)
+			}
+		})
+	}
+}
