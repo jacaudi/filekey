@@ -46,4 +46,13 @@ describe('Dead code stays deleted (antd conversion phase 1, design §10.1)', () 
         assert.ok(!db.includes('cursorDataToFcn'), 'db-handler.js must not define cursorDataToFcn');
         assert.ok(!db.includes('deleteKey'), 'db-handler.js must not define deleteKey');
     });
+    it('unused keccak256/lazy_keccak variant is gone from both copies', { skip: !hasFullRepo && 'skip' }, () => {
+        for (const rel of ['js/lib/keccak.js', 'js/worker/keccak.js']) {
+            const src = read(rel);
+            assert.ok(!src.includes('lazy_keccak'), rel + ' must not define lazy_keccak');
+            assert.ok(!/this\.keccak256/.test(src), rel + ' must not expose keccak256');
+            assert.ok(src.includes('strict_hex_keccak256'), rel + ' must keep strict_hex_keccak256');
+            assert.ok(src.includes('str_keccak256'), rel + ' must keep str_keccak256');
+        }
+    });
 });
