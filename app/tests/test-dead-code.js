@@ -55,4 +55,11 @@ describe('Dead code stays deleted (antd conversion phase 1, design §10.1)', () 
             assert.ok(src.includes('str_keccak256'), rel + ' must keep str_keccak256');
         }
     });
+    it('webauthn_handler has no BitNote default params', { skip: !hasFullRepo && 'skip' }, () => {
+        const src = read('js/lib/webauthn.js');
+        assert.ok(!src.includes('BitNote'), 'webauthn.js must not reference BitNote');
+        assert.ok(!src.includes('bitnote'), 'webauthn.js must not reference bitnote.xyz');
+        assert.ok(src.includes('function webauthn_handler(init_params)'),
+            'init_params must be a required parameter');
+    });
 });
