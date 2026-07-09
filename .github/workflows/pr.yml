@@ -46,9 +46,20 @@ jobs:
       setup-command: node scripts/build.js && cp -r app server/app
       artifact-name: test-results-go
 
+  test-web:
+    name: Test Web
+    uses: jacaudi/github-actions/.github/workflows/test.yml@v0.13.0
+    with:
+      test-framework: custom
+      working-directory: web
+      setup-command: npm ci
+      test-command: npm test
+      node-version: '22'
+      artifact-name: test-results-web
+
   docker:
     name: Docker Build
-    needs: [lint-go, lint-config, test-node, test-go]
+    needs: [lint-go, lint-config, test-node, test-go, test-web]
     uses: jacaudi/github-actions/.github/workflows/docker-build.yml@v0.13.0
     permissions:
       contents: read
