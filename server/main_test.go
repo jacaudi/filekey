@@ -1,11 +1,14 @@
 package main
 
 import (
+	"context"
 	"io/fs"
+	"net"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
+	"time"
 )
 
 func makeHandler(t *testing.T) http.Handler {
@@ -200,5 +203,47 @@ func TestParsePort(t *testing.T) {
 				t.Errorf("parsePort(%d, %q) = %d, want %d", tc.flagPort, tc.env, got, tc.want)
 			}
 		})
+	}
+}
+
+func TestNewServer(t *testing.T) {
+	srv := newServer(":9999", http.NotFoundHandler())
+	if srv.Addr != ":9999" {
+		t.Errorf("Addr = %q, want :9999", srv.Addr)
+	}
+	if srv.Handler == nil {
+		t.Error("Handler must be set directly (no DefaultServeMux)")
+	}
+	if srv.ReadHeaderTimeout <= 0 || srv.ReadTimeout <= 0 || srv.WriteTimeout <= 0 || srv.IdleTimeout <= 0 {
+		t.Errorf("all timeouts must be positive: %+v", srv)
+	}
+}
+
+func TestRunShutsDownOnContextCancel(t *testing.T) {
+	srv := newServer("127.0.0.1:0", http.NotFoundHandler())
+	ctx, cancel := context.WithCancel(context.Background())
+	done := make(chan error, 1)
+	go func() { done <- run(ctx, srv) }()
+	time.Sleep(100 * time.Millisecond) // let ListenAndServe start
+	cancel()
+	select {
+	case err := <-done:
+		if err != nil {
+			t.Fatalf("graceful shutdown returned error: %v", err)
+		}
+	case <-time.After(5 * time.Second):
+		t.Fatal("run did not return after context cancel")
+	}
+}
+
+func TestRunReturnsListenError(t *testing.T) {
+	ln, err := net.Listen("tcp", "127.0.0.1:0")
+	if err != nil {
+		t.Fatalf("net.Listen: %v", err)
+	}
+	defer ln.Close()
+	srv := newServer(ln.Addr().String(), http.NotFoundHandler())
+	if err := run(context.Background(), srv); err == nil {
+		t.Fatal("expected listen error for already-bound address")
 	}
 }
