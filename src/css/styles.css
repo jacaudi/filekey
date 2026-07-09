@@ -828,59 +828,6 @@ dialog.fk_modal::backdrop {
     }
 }
 
-.topbar_ns_container {
-    position: fixed;
-    width: 100%;
-    left: 0;
-    z-index: 2139002000
-}
-
-.std_notification_bar {
-    position: relative;
-    background-color: #ffdb01;
-    display: flex;
-    align-items: center;
-    padding: 20px 40px
-}
-
-.std_notification_msg {
-    color: #000;
-    font-size: 20px;
-    font-weight: 500;
-    flex-grow: 1;
-    line-height: 20px;
-}
-
-.std_notfication_close {
-    color: #000;
-    right: 10px;
-    cursor: pointer;
-}
-
-.std_close_container {
-}
-
-.std_close_icon {
-    right: 10px;
-    cursor: pointer;
-    z-index: 2100000004;
-    fill: #fff;
-    width: 15px;
-    height: 15px;
-    margin-left: 10px;
-}
-
-.std_icon_container {
-    margin-right: 10px;
-    font-size: 0
-}
-
-.std_icon {
-    fill: #fff;
-    width: 24px;
-    height: 24px;
-}
-
 @media(orientation: portrait) and (max-width: 800px) {
     #logo_container, #chiz_container {
         top: env(safe-area-inset-top, 8px);
@@ -902,22 +849,6 @@ dialog.fk_modal::backdrop {
 
     #drop_container {
         width: 90%;
-    }
-
-    .std_notification_msg {
-        font-size:16px;
-    }
-
-    .std_notification_bar {
-        flex-direction: row;
-        align-items: center;
-        padding: 20px 15px
-    }
-
-    .std_notfication_close {
-        position: unset;
-        margin: 0 0 0 auto;
-        padding: 0 5px
     }
 
     dialog.fk_modal {
