@@ -375,18 +375,8 @@ body {
     margin-right: 10px;
 }
 
-.icon_container, .action_icon_container {
+.icon_container {
     flex-shrink: 0
-}
-
-.action_icon_container {
-    margin-left: 15px;
-    cursor: pointer;
-}
-
-.special_action {
-    transform: rotate(270deg);
-    display: none;
 }
 
 .std_file_container {

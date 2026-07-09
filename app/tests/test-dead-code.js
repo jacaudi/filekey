@@ -24,4 +24,17 @@ describe('Dead code stays deleted (antd conversion phase 1, design §10.1)', () 
         assert.ok(!read('css/styles.css').includes('std_notfication_close'),
             'styles.css must not style .std_notfication_close');
     });
+    it('webm blob-link path is gone', { skip: !hasFullRepo && 'skip' }, () => {
+        const fileOps = read('js/ui/file-ops.js');
+        assert.ok(!fileOps.includes('createWebmLink'), 'file-ops.js must not define createWebmLink');
+        assert.ok(!fileOps.includes('checkIfViewableType'), 'file-ops.js must not define checkIfViewableType');
+        const renderer = read('js/ui/renderer.js');
+        assert.ok(!renderer.includes('_blob'), 'renderer.js must not create the hidden _blob element');
+        assert.ok(!renderer.includes('special_action'), 'renderer.js must not use .special_action');
+        assert.ok(!renderer.includes('case "dl_icon"'), 'getSvg must not keep the orphaned dl_icon case');
+        const css = read('css/styles.css');
+        assert.ok(!css.includes('special_action'), 'styles.css must not style .special_action');
+        assert.ok(!css.includes('action_icon_container'), 'styles.css must not style .action_icon_container');
+        assert.ok(css.includes('.dl_icon'), '.dl_icon class must be KEPT (used by the Share icon)');
+    });
 });
