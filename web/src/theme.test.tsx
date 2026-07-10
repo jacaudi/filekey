@@ -1,6 +1,6 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { ThemeProvider, useTheme } from './theme';
+import { appTheme, ThemeProvider, useTheme } from './theme';
 
 function Probe() {
   const { mode, toggle } = useTheme();
@@ -10,6 +10,12 @@ function Probe() {
     </button>
   );
 }
+
+describe('appTheme', () => {
+  it('sets controlHeightLG to 44 for the design §6/§9 ≥44px touch-target budget', () => {
+    expect(appTheme.token?.controlHeightLG).toBe(44);
+  });
+});
 
 describe('ThemeProvider', () => {
   beforeEach(() => {

@@ -19,7 +19,10 @@ const STORAGE_KEY = 'fk_theme'; // parity with the old app's persistence key
 // (e.g. controlHeightLG). Keep the token minimal — colorPrimary is the only brand
 // override (design §4).
 export const appTheme: ThemeConfig = {
-  token: { colorPrimary: BRAND_PRIMARY },
+  token: {
+    colorPrimary: BRAND_PRIMARY,
+    controlHeightLG: 44, // ≥44px touch targets (design §6/§9)
+  },
   algorithm: antdTheme.defaultAlgorithm,
 };
 
