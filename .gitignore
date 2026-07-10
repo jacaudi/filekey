@@ -4,3 +4,5 @@ app/index.html
 server/app/
 web/node_modules/
 web/dist/
+server/dist/*
+!server/dist/.gitkeep
