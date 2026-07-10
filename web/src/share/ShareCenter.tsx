@@ -14,6 +14,7 @@ import {
   Typography,
 } from 'antd';
 import { useSession } from '../state/session';
+import { useInboundShare } from './inbound';
 import { shareLink } from './link';
 import { RecipientsPane } from './RecipientsPane';
 import { ShareQr } from './ShareQr';
@@ -22,7 +23,9 @@ const SHARE_TITLE = 'FileKey';
 const SHARE_TEXT = 'Send me encrypted files with FileKey';
 
 /** Header action (D3). Owns open/unlock state; WebAuthn fires from the click. */
-export function MyShareKeyButton({ activePubHex = null }: { activePubHex?: string | null }) {
+export function MyShareKeyButton() {
+  const inbound = useInboundShare();
+  const activePubHex = inbound?.pubHex ?? null;
   const { locked, unlock } = useSession();
   const [open, setOpen] = useState(false);
   const [unlocking, setUnlocking] = useState(false);

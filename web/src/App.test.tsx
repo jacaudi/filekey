@@ -26,6 +26,8 @@ vi.mock('./files/db', () => ({
   clearJobs: vi.fn().mockResolvedValue(undefined),
   clearRecipients: vi.fn().mockResolvedValue(undefined),
   requestPersistence: vi.fn().mockResolvedValue(true),
+  // resolveInboundShare (inbound.tsx) looks up saved recipients by pubHex.
+  listRecipients: vi.fn().mockResolvedValue([]),
 }));
 
 const call = vi.mocked(rpc.call);
@@ -63,28 +65,19 @@ describe('App', () => {
     await waitFor(() => expect(vi.mocked(clearJobs)).toHaveBeenCalled());
   });
 
-  it('attaches a valid ?pub= key via set_shared_pub and shows the parity banner', async () => {
+  it('shows the inbound share banner for a valid ?pub= key', async () => {
     window.history.replaceState({}, '', `/?pub=${VALID_PUB}`);
     call.mockImplementation(async (t: string) => (t === 'set_shared_pub' ? true : null));
     renderApp();
 
-    await waitFor(() =>
-      expect(call).toHaveBeenCalledWith(
-        'set_shared_pub',
-        { pub_buff: expect.any(ArrayBuffer) },
-        [expect.any(ArrayBuffer)],
-      ),
-    );
-    const banner = await screen.findByRole('alert');
-    expect(banner).toHaveTextContent(/share key attached/i);
-    expect(banner).toHaveTextContent(/04aa…aaaa/i);
+    expect(await screen.findByText(/sharing to 04aa…aaaa/i)).toBeInTheDocument();
   });
 
   it('ignores an invalid ?pub= value', async () => {
     window.history.replaceState({}, '', '/?pub=deadbeef');
     renderApp();
     await waitFor(() => expect(vi.mocked(clearJobs)).toHaveBeenCalled());
-    expect(call.mock.calls.some(([t]) => t === 'set_shared_pub')).toBe(false);
+    expect(screen.queryByText(/sharing to/i)).toBeNull();
   });
 
   it('unlocking swaps onboarding for the drop zone; reset returns to onboarding', async () => {
