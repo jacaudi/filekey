@@ -64,7 +64,7 @@ func buildHandler(distFS fs.FS, indexContent string) http.Handler {
 			w.Header().Set("Content-Type", "text/html; charset=utf-8")
 			w.Write([]byte(indexContent))
 			return
-		case "/manifest.json":
+		case "/manifest.webmanifest":
 			w.Header().Set("Cache-Control", "no-cache")
 		default:
 			w.Header().Set("Cache-Control", "public, max-age=31536000, immutable")

@@ -55,7 +55,7 @@ func TestCacheControlHeaders(t *testing.T) {
 		{"/sw.js", "no-store", "/"},
 		{"/", "no-cache", ""},
 		{"/index.html", "no-cache", ""},
-		{"/manifest.json", "no-cache", ""},
+		{"/manifest.webmanifest", "no-cache", ""},
 		{"/logo.svg", "public, max-age=31536000, immutable", ""},
 	}
 
@@ -88,7 +88,7 @@ func TestSecurityHeaders(t *testing.T) {
 		"Strict-Transport-Security": "max-age=63072000; includeSubDomains",
 	}
 
-	for _, path := range []string{"/", "/sw.js", "/manifest.json", "/logo.svg"} {
+	for _, path := range []string{"/", "/sw.js", "/manifest.webmanifest", "/logo.svg"} {
 		t.Run(path, func(t *testing.T) {
 			req := httptest.NewRequest(http.MethodGet, path, nil)
 			w := httptest.NewRecorder()
@@ -138,7 +138,7 @@ func TestEmbeddedFiles(t *testing.T) {
 	for _, path := range []string{
 		"dist/index.html",
 		"dist/sw.js",
-		"dist/manifest.json",
+		"dist/manifest.webmanifest",
 		"dist/logo.svg",
 	} {
 		t.Run(path, func(t *testing.T) {
