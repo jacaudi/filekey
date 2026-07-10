@@ -2,7 +2,12 @@ import { Alert, Layout } from 'antd';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { rpc } from './crypto/client';
 import { hexToArrayBuffer } from './crypto/buffer';
-import { clearJobs as clearJobCache, requestPersistence, saveJob } from './files/db';
+import {
+  clearJobs as clearJobCache,
+  clearRecipients,
+  requestPersistence,
+  saveJob,
+} from './files/db';
 import { jobStatusLabel, processFiles, type FileJob } from './files/ops';
 import { StatusAnnouncer } from './a11y/StatusAnnouncer';
 import { AppHeader } from './ui/AppHeader';
@@ -83,9 +88,9 @@ export default function App() {
   );
 
   const handleReset = useCallback(async () => {
-    // Nuclear option (design §5.4): wipe session + file cache, replay onboarding.
-    // Phase 4 adds the saved-recipients wipe here.
-    await clearJobCache();
+    // Nuclear option (design §5.4): wipe session + file cache + saved recipients,
+    // replay onboarding. Lock (header onLock) intentionally does not touch recipients.
+    await Promise.all([clearJobCache(), clearRecipients()]);
     await lock();
     setJobs([]);
     setAttachedPub(null);

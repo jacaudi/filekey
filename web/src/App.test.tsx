@@ -24,6 +24,7 @@ vi.mock('./files/db', () => ({
   saveJob: vi.fn().mockResolvedValue(undefined),
   getJob: vi.fn().mockResolvedValue(null),
   clearJobs: vi.fn().mockResolvedValue(undefined),
+  clearRecipients: vi.fn().mockResolvedValue(undefined),
   requestPersistence: vi.fn().mockResolvedValue(true),
 }));
 
