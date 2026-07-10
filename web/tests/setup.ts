@@ -46,3 +46,7 @@ if (typeof window !== 'undefined' && typeof window.matchMedia !== 'function') {
       }) as unknown as MediaQueryList,
   });
 }
+
+import { cleanup } from '@testing-library/react';
+import { afterEach } from 'vitest';
+afterEach(cleanup);
