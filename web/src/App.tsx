@@ -1,8 +1,11 @@
-import { Alert, Layout } from 'antd';
+import { App as AntApp, Layout } from 'antd';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { rpc } from './crypto/client';
-import { hexToArrayBuffer } from './crypto/buffer';
-import { clearJobs as clearJobCache, requestPersistence, saveJob } from './files/db';
+import {
+  clearJobs as clearJobCache,
+  clearRecipients,
+  requestPersistence,
+  saveJob,
+} from './files/db';
 import { jobStatusLabel, processFiles, type FileJob } from './files/ops';
 import { StatusAnnouncer } from './a11y/StatusAnnouncer';
 import { AppHeader } from './ui/AppHeader';
@@ -13,8 +16,12 @@ import { InfoModal } from './ui/InfoModal';
 import { Onboarding } from './ui/Onboarding';
 import { UpdatePrompt } from './pwa/UpdatePrompt';
 import { useSession } from './state/session';
-
-const PUB_RE = /^04[0-9a-fA-F]{264}$/;
+import {
+  InboundShareBanner,
+  InboundShareContext,
+  resolveInboundShare,
+  type InboundShare,
+} from './share/inbound';
 
 const DOC_TITLES: Record<DocKey, string> = {
   howItWorks: 'How FileKey Works',
@@ -27,11 +34,12 @@ function appVersion(): string {
 }
 
 export default function App() {
+  const { message } = AntApp.useApp();
   const { locked, unlock, lock } = useSession();
   const [ready, setReady] = useState(false);
   const [jobs, setJobs] = useState<FileJob[]>([]);
   const [openDoc, setOpenDoc] = useState<DocKey | null>(null);
-  const [attachedPub, setAttachedPub] = useState<string | null>(null);
+  const [inbound, setInbound] = useState<InboundShare | null>(null);
 
   // First successful unlock completes onboarding for this session.
   useEffect(() => {
@@ -48,16 +56,17 @@ export default function App() {
     });
   }, []);
 
-  // ?pub= parity (design §2.2/§9): validate, attach, minimal notice. Full banner
-  // UX (saved-recipient matching, save-as-recipient) is Phase 4.
+  // Inbound ?pub= deep link (design §8.3/§14): validate, resolve saved-recipient
+  // name, offer save-as-recipient. Leaves the key attached in the worker.
   useEffect(() => {
-    const pub = new URLSearchParams(window.location.search).get('pub');
-    if (!pub || !PUB_RE.test(pub)) return;
-    const pub_buff = hexToArrayBuffer(pub);
-    rpc
-      .call('set_shared_pub', { pub_buff }, [pub_buff])
-      .then(() => setAttachedPub(pub))
-      .catch(() => setAttachedPub(null));
+    resolveInboundShare(location.search).then((result) => {
+      if (result === 'invalid') {
+        message.error('Invalid share link');
+      } else if (result !== null) {
+        setInbound(result);
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const onJob = useCallback((job: FileJob) => {
@@ -83,68 +92,65 @@ export default function App() {
   );
 
   const handleReset = useCallback(async () => {
-    // Nuclear option (design §5.4): wipe session + file cache, replay onboarding.
-    // Phase 4 adds the saved-recipients wipe here.
-    await clearJobCache();
+    // Nuclear option (design §5.4): wipe session + file cache + saved recipients,
+    // replay onboarding. Lock (header onLock) intentionally does not touch recipients.
+    await Promise.all([clearJobCache(), clearRecipients()]);
     await lock();
     setJobs([]);
-    setAttachedPub(null);
+    setInbound(null);
     setReady(false);
   }, [lock]);
 
   const version = useMemo(appVersion, []);
 
   return (
-    <Layout style={{ minHeight: '100dvh' }}>
-      <UpdatePrompt />
-      <StatusAnnouncer
-        jobs={jobs.map((j) => ({ id: j.id, name: j.name, status: jobStatusLabel(j) }))}
-      />
-      <AppHeader
-        locked={locked}
-        onLock={() => void lock()}
-        onReset={() => void handleReset()}
-        onOpenDoc={setOpenDoc}
-        version={version}
-      />
-      {attachedPub && (
-        <Alert
-          type="info"
-          showIcon
-          closable
-          role="alert"
-          style={{ margin: '0 16px' }}
-          message={`Share key attached: ${attachedPub.slice(0, 4)}…${attachedPub.slice(-4)}`}
-          description="This recipient key is set for this session."
-          onClose={() => setAttachedPub(null)}
+    <InboundShareContext.Provider value={inbound}>
+      {inbound !== null && (
+        <InboundShareBanner
+          share={inbound}
+          onSaved={(name) => setInbound({ ...inbound, recipientName: name })}
+          onDismiss={() => setInbound(null)}
         />
       )}
-      <Layout.Content
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 16,
-          padding: 16,
-          paddingBottom: 'max(16px, env(safe-area-inset-bottom))',
-          paddingLeft: 'max(16px, env(safe-area-inset-left))',
-          paddingRight: 'max(16px, env(safe-area-inset-right))',
-        }}
-      >
-        {!ready ? (
-          <Onboarding onOpenDoc={setOpenDoc} />
-        ) : (
-          <>
-            <FileList jobs={jobs} />
-            <DropZone onFiles={(files) => void handleFiles(files)} />
-          </>
-        )}
-      </Layout.Content>
-      <InfoModal
-        title={openDoc ? DOC_TITLES[openDoc] : ''}
-        markdown={openDoc ? DOCS[openDoc] : ''}
-        open={openDoc !== null}
-        onClose={() => setOpenDoc(null)}
-      />
-    </Layout>
+      <Layout style={{ minHeight: '100dvh' }}>
+        <UpdatePrompt />
+        <StatusAnnouncer
+          jobs={jobs.map((j) => ({ id: j.id, name: j.name, status: jobStatusLabel(j) }))}
+        />
+        <AppHeader
+          locked={locked}
+          onLock={() => void lock()}
+          onReset={() => void handleReset()}
+          onOpenDoc={setOpenDoc}
+          version={version}
+        />
+        <Layout.Content
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 16,
+            padding: 16,
+            paddingBottom: 'max(16px, env(safe-area-inset-bottom))',
+            paddingLeft: 'max(16px, env(safe-area-inset-left))',
+            paddingRight: 'max(16px, env(safe-area-inset-right))',
+          }}
+        >
+          {!ready ? (
+            <Onboarding onOpenDoc={setOpenDoc} />
+          ) : (
+            <>
+              <FileList jobs={jobs} />
+              <DropZone onFiles={(files) => void handleFiles(files)} />
+            </>
+          )}
+        </Layout.Content>
+        <InfoModal
+          title={openDoc ? DOC_TITLES[openDoc] : ''}
+          markdown={openDoc ? DOCS[openDoc] : ''}
+          open={openDoc !== null}
+          onClose={() => setOpenDoc(null)}
+        />
+      </Layout>
+    </InboundShareContext.Provider>
   );
 }

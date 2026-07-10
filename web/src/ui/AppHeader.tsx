@@ -2,6 +2,7 @@ import { LockOutlined, MenuOutlined, MoonOutlined, SunOutlined } from '@ant-desi
 import { Button, Drawer, Dropdown, Grid, Menu, Space, Tag, Typography } from 'antd';
 import { useState } from 'react';
 import { useTheme } from '../theme';
+import { MyShareKeyButton } from '../share/ShareCenter';
 import type { DocKey } from './content';
 
 export type AppHeaderProps = {
@@ -73,6 +74,7 @@ export function AppHeader({ locked, onLock, onReset, onOpenDoc, version }: AppHe
           Lock
         </Button>
       )}
+      <MyShareKeyButton />
       <Button
         type="text"
         aria-label="Toggle dark mode"

@@ -3,6 +3,23 @@ import { describe, expect, it, vi } from 'vitest';
 import { AppHeader } from './AppHeader';
 import { ThemeProvider } from '../theme';
 
+// AppHeader now renders <MyShareKeyButton /> (../share/ShareCenter), which pulls in
+// ../state/session → ../crypto/client, whose module scope does `new Worker(...)`;
+// jsdom has no Worker. Mock the session hook so AppHeader's own tests stay focused
+// on header chrome — Share Center behavior is covered by ShareCenter.test.tsx.
+vi.mock('../state/session', () => ({
+  useSession: () => ({
+    locked: false,
+    unlock: vi.fn().mockResolvedValue(true),
+    lock: vi.fn(),
+    getSharePubHex: vi.fn().mockResolvedValue(null),
+  }),
+}));
+// (Task 8) ShareCenter → RecipientsPane → ./validate also pulls in ../crypto/client
+// directly (not just via session), so the session mock above no longer shields this
+// suite from the module-scope `new Worker(...)`. Mock the singleton too.
+vi.mock('../crypto/client', () => ({ rpc: { call: vi.fn() } }));
+
 function renderHeader(over: Partial<Parameters<typeof AppHeader>[0]> = {}) {
   const props = {
     locked: true,
