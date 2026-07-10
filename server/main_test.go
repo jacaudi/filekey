@@ -13,19 +13,19 @@ import (
 
 func makeHandler(t *testing.T) http.Handler {
 	t.Helper()
-	appFS, err := fs.Sub(staticFiles, "app")
+	distFS, err := fs.Sub(staticFiles, "dist")
 	if err != nil {
 		t.Fatalf("failed to create sub FS: %v", err)
 	}
-	indexContent, err := prepareIndexContent(appFS)
+	indexContent, err := prepareIndexContent(distFS)
 	if err != nil {
 		t.Fatalf("failed to read embedded index.html: %v", err)
 	}
-	return buildHandler(appFS, indexContent)
+	return buildHandler(distFS, indexContent)
 }
 
 func TestVersionInjection(t *testing.T) {
-	raw, err := staticFiles.ReadFile("app/index.html")
+	raw, err := staticFiles.ReadFile("dist/index.html")
 	if err != nil {
 		t.Fatalf("failed to read embedded index.html: %v", err)
 	}
@@ -117,57 +117,35 @@ func TestCSPHeader(t *testing.T) {
 
 	for _, directive := range []string{
 		"default-src 'self'",
-		"script-src 'self' 'unsafe-inline'",
-		"style-src 'self' 'unsafe-inline'",
-		"worker-src 'self' blob:",
+		"script-src 'self';",
+		"style-src 'self' 'unsafe-inline';",
+		"worker-src 'self';",
 	} {
 		if !strings.Contains(csp, directive) {
 			t.Errorf("CSP missing directive: %s", directive)
 		}
 	}
+
+	if strings.Contains(csp, "script-src 'self' 'unsafe-inline'") {
+		t.Error("CSP must not permit unsafe-inline scripts")
+	}
+	if strings.Contains(csp, "blob:") {
+		t.Error("CSP must not permit blob: origins")
+	}
 }
 
 func TestEmbeddedFiles(t *testing.T) {
 	for _, path := range []string{
-		"app/index.html",
-		"app/sw.js",
-		"app/manifest.json",
-		"app/logo.svg",
+		"dist/index.html",
+		"dist/sw.js",
+		"dist/manifest.json",
+		"dist/logo.svg",
 	} {
 		t.Run(path, func(t *testing.T) {
 			if _, err := staticFiles.Open(path); err != nil {
 				t.Errorf("embedded file not found: %v", err)
 			}
 		})
-	}
-}
-
-func TestFKDebugInjection(t *testing.T) {
-	handler := makeHandler(t)
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
-	w := httptest.NewRecorder()
-	handler.ServeHTTP(w, req)
-	body := w.Body.String()
-	if !strings.Contains(body, "let FK_DEBUG = false") {
-		t.Error("default response must contain 'let FK_DEBUG = false'")
-	}
-	if strings.Contains(body, "let FK_DEBUG = true") {
-		t.Error("default response must NOT contain 'let FK_DEBUG = true'")
-	}
-}
-
-func TestFKDebugEnabled(t *testing.T) {
-	t.Setenv("FK_DEBUG", "true")
-	handler := makeHandler(t)
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
-	w := httptest.NewRecorder()
-	handler.ServeHTTP(w, req)
-	body := w.Body.String()
-	if strings.Contains(body, "let FK_DEBUG = false") {
-		t.Error("FK_DEBUG=true: response must NOT contain 'let FK_DEBUG = false'")
-	}
-	if !strings.Contains(body, "let FK_DEBUG = true") {
-		t.Error("FK_DEBUG=true: response must contain 'let FK_DEBUG = true'")
 	}
 }
 

@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { describe, expect, it } from 'vitest';
 import { convertKeys, generateKeyPair } from '../src/crypto/ecdh';
 import { deriveEcdhKey, encrypt, importEcdhPub, noDecodeDecrypt } from '../src/crypto/encryption';

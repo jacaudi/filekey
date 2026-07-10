@@ -17,7 +17,7 @@ import (
 	"time"
 )
 
-//go:embed app
+//go:embed all:dist
 var staticFiles embed.FS
 
 // Version is set at build time via -ldflags="-X main.Version=<tag>"
@@ -25,20 +25,16 @@ var Version = "dev"
 
 const shutdownTimeout = 10 * time.Second
 
-func prepareIndexContent(appFS fs.FS) (string, error) {
-	indexBytes, err := fs.ReadFile(appFS, "index.html")
+func prepareIndexContent(distFS fs.FS) (string, error) {
+	indexBytes, err := fs.ReadFile(distFS, "index.html")
 	if err != nil {
 		return "", err
 	}
-	indexContent := strings.Replace(string(indexBytes), "__APP_VERSION__", Version, 1)
-	if os.Getenv("FK_DEBUG") == "true" {
-		indexContent = strings.ReplaceAll(indexContent, "let FK_DEBUG = false", "let FK_DEBUG = true")
-	}
-	return indexContent, nil
+	return strings.Replace(string(indexBytes), "__APP_VERSION__", Version, 1), nil
 }
 
-func buildHandler(appFS fs.FS, indexContent string) http.Handler {
-	fileServer := http.FileServer(http.FS(appFS))
+func buildHandler(distFS fs.FS, indexContent string) http.Handler {
+	fileServer := http.FileServer(http.FS(distFS))
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("X-Frame-Options", "DENY")
@@ -48,13 +44,13 @@ func buildHandler(appFS fs.FS, indexContent string) http.Handler {
 		w.Header().Set("Strict-Transport-Security", "max-age=63072000; includeSubDomains")
 		w.Header().Set("Content-Security-Policy",
 			"default-src 'self'; "+
-				"script-src 'self' 'unsafe-inline'; "+
+				"script-src 'self'; "+
 				"style-src 'self' 'unsafe-inline'; "+
 				"img-src 'self' data:; "+
 				"font-src 'self'; "+
 				"connect-src 'self'; "+
 				"manifest-src 'self'; "+
-				"worker-src 'self' blob:; "+
+				"worker-src 'self'; "+
 				"form-action 'none'; "+
 				"base-uri 'self'")
 
@@ -129,13 +125,13 @@ func main() {
 		os.Exit(1)
 	}
 
-	appFS, err := fs.Sub(staticFiles, "app")
+	distFS, err := fs.Sub(staticFiles, "dist")
 	if err != nil {
 		slog.Error("failed to create sub FS", "err", err)
 		os.Exit(1)
 	}
 
-	indexContent, err := prepareIndexContent(appFS)
+	indexContent, err := prepareIndexContent(distFS)
 	if err != nil {
 		slog.Error("failed to read embedded index.html", "err", err)
 		os.Exit(1)
@@ -144,7 +140,7 @@ func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 
-	srv := newServer(fmt.Sprintf(":%d", port), buildHandler(appFS, indexContent))
+	srv := newServer(fmt.Sprintf(":%d", port), buildHandler(distFS, indexContent))
 	slog.Info("FileKey listening", "addr", "http://0.0.0.0"+srv.Addr, "version", Version)
 	if err := run(ctx, srv); err != nil {
 		slog.Error("server error", "err", err)

@@ -1,27 +1,18 @@
 # =============================================================
-# Stage 1 — Download Inter Variable font
+# Stage 1 — Build the web bundle (Vite)
 # =============================================================
-FROM alpine:3 AS fonts
+FROM node:22-alpine AS web-build
 
-RUN apk add --no-cache curl unzip && \
-    curl -fsSL "https://github.com/rsms/inter/releases/download/v4.0/Inter-4.0.zip" \
-         -o /tmp/inter.zip && \
-    unzip /tmp/inter.zip -d /tmp/inter && \
-    find /tmp/inter -name "InterVariable.ttf" -exec cp {} /inter_variable.ttf \;
-
-# =============================================================
-# Stage 2 — Generate app/index.html from source
-# =============================================================
-FROM node:22-alpine AS js-build
-
-WORKDIR /build
-COPY scripts/ scripts/
-COPY src/ src/
-COPY app/ app/
-RUN node scripts/build.js
+WORKDIR /build/web
+COPY web/package.json web/package-lock.json ./
+RUN npm ci
+# docs/ is imported at build time (?raw markdown single-sourcing)
+COPY docs/ /build/docs/
+COPY web/ ./
+RUN npm run build
 
 # =============================================================
-# Stage 3 — Compile the Go static-file server with embedded app
+# Stage 2 — Compile the Go static-file server with embedded dist
 # =============================================================
 FROM golang:1.26-alpine AS build
 
@@ -31,8 +22,7 @@ COPY server/go.mod ./
 RUN go mod download
 
 COPY server/main.go ./
-COPY --from=js-build /build/app/ ./app/
-COPY --from=fonts /inter_variable.ttf ./app/fonts/inter_variable.ttf
+COPY --from=web-build /build/web/dist/ ./dist/
 
 ARG APP_VERSION=dev
 RUN CGO_ENABLED=0 GOOS=linux go build \
@@ -42,7 +32,7 @@ RUN CGO_ENABLED=0 GOOS=linux go build \
     .
 
 # =============================================================
-# Stage 4 — Minimal scratch image with just the binary
+# Stage 3 — Minimal scratch image with just the binary
 # =============================================================
 FROM scratch
 
