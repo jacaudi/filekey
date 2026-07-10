@@ -9,6 +9,13 @@ import * as save from '../files/save';
 // files/ops.test.ts already does, since this suite only exercises label rendering.
 vi.mock('../crypto/client', () => ({ rpc: { call: vi.fn() } }));
 
+// FileList now renders ShareFileAction (T10) per done row; useSession() throws
+// outside a <SessionProvider>, so mock it like ShareFileAction.test.tsx does —
+// this suite only asserts the per-row Share control is present, not its flow.
+vi.mock('../state/session', () => ({
+  useSession: () => ({ locked: false, unlock: vi.fn(), lock: vi.fn(), getSharePubHex: vi.fn() }),
+}));
+
 const done = (id: string, over: Partial<FileJob> = {}): FileJob => ({
   id,
   name: 'a.png',
@@ -72,5 +79,22 @@ describe('FileList', () => {
   it('renders nothing for an empty job list', () => {
     const { container } = render(<FileList jobs={[]} />);
     expect(container).toBeEmptyDOMElement();
+  });
+
+  it('renders Share as a sibling child of Save per row, not a List.Item actions array (B2)', () => {
+    render(<FileList jobs={[done('1'), done('2')]} />);
+    const items = screen.getAllByRole('listitem');
+    // Exactly one <li> per job — an `actions` array would add an extra <li> per action.
+    expect(items).toHaveLength(2);
+    for (const item of items) {
+      expect(within(item).getByRole('button', { name: 'Share' })).toBeInTheDocument();
+      expect(within(item).getByRole('button', { name: /^save$/i })).toBeInTheDocument();
+    }
+  });
+
+  it('omits Share when the job has no cached data (job.data === undefined)', () => {
+    render(<FileList jobs={[done('1', { data: undefined })]} />);
+    const item = screen.getByRole('listitem');
+    expect(within(item).queryByRole('button', { name: 'Share' })).toBeNull();
   });
 });

@@ -1,6 +1,7 @@
 import { Button, List, Spin, Tag, Typography } from 'antd';
 import { jobStatusLabel, type FileJob } from '../files/ops';
 import { saveJob } from '../files/save';
+import { ShareFileAction } from '../share/ShareFileAction';
 
 const NEXT_STEP: Record<string, string> = {
   'wrong passkey/key': 'Check you authenticated with the passkey this file was encrypted for.',
@@ -57,6 +58,9 @@ export function FileList({ jobs }: { jobs: FileJob[] }) {
                 ) : undefined
               }
             />
+            {job.status === 'done' && job.data !== undefined && (
+              <ShareFileAction key="share" job={job} />
+            )}
             {job.status === 'done' && (
               <Button type="primary" size="small" onClick={() => saveJob(job)}>
                 Save
