@@ -25,16 +25,6 @@ jobs:
       yamllint-config: .yamllint.yml
       json: true
 
-  test-node:
-    name: Test Node
-    uses: jacaudi/github-actions/.github/workflows/test.yml@v0.13.0
-    with:
-      test-framework: custom
-      setup-command: node scripts/build.js
-      test-command: node --test app/tests/test-*.js
-      node-version: '22'
-      artifact-name: test-results-node
-
   test-go:
     name: Test Go
     uses: jacaudi/github-actions/.github/workflows/test.yml@v0.13.0
@@ -42,8 +32,7 @@ jobs:
       test-framework: go
       working-directory: server
       go-version: stable
-      # node scripts/build.js relies on the Node.js pre-installed on ubuntu-latest (~v20+)
-      setup-command: node scripts/build.js && cp -r app server/app
+      setup-command: npm --prefix web ci && npm --prefix web run build && cp -r web/dist/. server/dist/
       artifact-name: test-results-go
 
   test-web:
@@ -62,7 +51,7 @@ jobs:
 
   docker:
     name: Docker Build
-    needs: [lint-go, lint-config, test-node, test-go, test-web]
+    needs: [lint-go, lint-config, test-go, test-web]
     uses: jacaudi/github-actions/.github/workflows/docker-build.yml@v0.13.0
     permissions:
       contents: read
