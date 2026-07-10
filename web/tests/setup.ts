@@ -47,6 +47,17 @@ if (typeof window !== 'undefined' && typeof window.matchMedia !== 'function') {
   });
 }
 
+// jsdom has no ResizeObserver; antd's rc-trigger (Popconfirm/Popover/Tooltip/Select)
+// observes trigger elements for positioning. First hit by RecipientsPane's Popconfirm.
+if (typeof globalThis.ResizeObserver === 'undefined') {
+  class NoopResizeObserver implements ResizeObserver {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  }
+  globalThis.ResizeObserver = NoopResizeObserver;
+}
+
 import { cleanup } from '@testing-library/react';
 import { afterEach } from 'vitest';
 afterEach(cleanup);

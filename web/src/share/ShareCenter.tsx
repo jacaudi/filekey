@@ -8,12 +8,14 @@ import {
   Grid,
   Modal,
   Result,
+  Segmented,
   Space,
   Spin,
   Typography,
 } from 'antd';
 import { useSession } from '../state/session';
 import { shareLink } from './link';
+import { RecipientsPane } from './RecipientsPane';
 import { ShareQr } from './ShareQr';
 
 const SHARE_TITLE = 'FileKey';
@@ -141,15 +143,30 @@ export function ShareCenter({
   );
 }
 
-// activePubHex is consumed by the Recipients pane (Task 8); referenced here so
-// the prop is part of the component contract from the start.
 function ShareCenterBody({
   pubHex,
+  activePubHex,
 }: {
   pubHex: string;
   activePubHex: string | null;
 }) {
-  return <MyKeyPane pubHex={pubHex} />;
+  const [pane, setPane] = useState<'My Key' | 'Recipients'>('My Key');
+  return (
+    <Space direction="vertical" size="large" style={{ width: '100%' }}>
+      <Segmented
+        block
+        size="large"
+        options={['My Key', 'Recipients']}
+        value={pane}
+        onChange={(v) => setPane(v as 'My Key' | 'Recipients')}
+      />
+      {pane === 'My Key' ? (
+        <MyKeyPane pubHex={pubHex} />
+      ) : (
+        <RecipientsPane activePubHex={activePubHex} />
+      )}
+    </Space>
+  );
 }
 
 function MyKeyPane({ pubHex }: { pubHex: string }) {

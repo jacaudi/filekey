@@ -17,6 +17,12 @@ vi.mock('./ShareQr', () => ({
 // ShareCenter → (Task 8/9) RecipientsPane/inbound → validate → crypto/client, which
 // constructs `new Worker(...)` at module scope; jsdom has no Worker. Mock the singleton.
 vi.mock('../crypto/client', () => ({ rpc: { call: vi.fn() } }));
+// RecipientsPane renders live in the pane-switch test below.
+vi.mock('../files/db', () => ({ listRecipients: vi.fn().mockResolvedValue([]) }));
+vi.mock('./QrScanner', () => ({
+  hasCamera: vi.fn().mockResolvedValue(false),
+  QrScanner: () => null,
+}));
 
 import { MyShareKeyButton } from './ShareCenter';
 
@@ -194,5 +200,18 @@ describe('container by breakpoint', () => {
     fireEvent.click(screen.getByRole('button', { name: 'My Share Key' }));
     await waitFor(() => expect(document.querySelector('.ant-modal')).not.toBeNull());
     expect(document.querySelector('.ant-drawer-bottom')).toBeNull();
+  });
+});
+
+describe('pane switching', () => {
+  it('switches to the Recipients pane via the segmented control', async () => {
+    renderCenter();
+    const dialog = await openCenter();
+    await within(dialog).findByRole('button', { name: 'Copy link' });
+    fireEvent.click(within(dialog).getByText('Recipients'));
+    expect(
+      await within(dialog).findByRole('textbox', { name: 'Share key or link' }),
+    ).toBeInTheDocument();
+    expect(within(dialog).queryByRole('button', { name: 'Copy link' })).toBeNull();
   });
 });

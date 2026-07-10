@@ -15,6 +15,10 @@ vi.mock('../state/session', () => ({
     getSharePubHex: vi.fn().mockResolvedValue(null),
   }),
 }));
+// (Task 8) ShareCenter → RecipientsPane → ./validate also pulls in ../crypto/client
+// directly (not just via session), so the session mock above no longer shields this
+// suite from the module-scope `new Worker(...)`. Mock the singleton too.
+vi.mock('../crypto/client', () => ({ rpc: { call: vi.fn() } }));
 
 function renderHeader(over: Partial<Parameters<typeof AppHeader>[0]> = {}) {
   const props = {
