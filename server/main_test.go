@@ -84,7 +84,7 @@ func TestSecurityHeaders(t *testing.T) {
 		"X-Frame-Options":           "DENY",
 		"X-Content-Type-Options":    "nosniff",
 		"Referrer-Policy":           "strict-origin-when-cross-origin",
-		"Permissions-Policy":        "camera=(), microphone=(), geolocation=()",
+		"Permissions-Policy":        "camera=(self), microphone=(), geolocation=()",
 		"Strict-Transport-Security": "max-age=63072000; includeSubDomains",
 	}
 
