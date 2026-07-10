@@ -1,7 +1,4 @@
-function webauthn_handler(init_params={
-    name: "BitNote",
-    id: "bitnote.xyz"
-}) {
+function webauthn_handler(init_params) {
     this.createCredential = createCredential;
     function createCredential(prf_obj, callback) {
         navigator.credentials.create({

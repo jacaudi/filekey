@@ -1,14 +1,20 @@
 package main
 
 import (
+	"context"
 	"embed"
+	"errors"
 	"flag"
 	"fmt"
 	"io/fs"
-	"log"
+	"log/slog"
 	"net/http"
 	"os"
+	"os/signal"
+	"strconv"
 	"strings"
+	"syscall"
+	"time"
 )
 
 //go:embed app
@@ -16,6 +22,8 @@ var staticFiles embed.FS
 
 // Version is set at build time via -ldflags="-X main.Version=<tag>"
 var Version = "dev"
+
+const shutdownTimeout = 10 * time.Second
 
 func prepareIndexContent(appFS fs.FS) (string, error) {
 	indexBytes, err := fs.ReadFile(appFS, "index.html")
@@ -29,12 +37,7 @@ func prepareIndexContent(appFS fs.FS) (string, error) {
 	return indexContent, nil
 }
 
-func buildHandler(indexContent string) http.Handler {
-	appFS, err := fs.Sub(staticFiles, "app")
-	if err != nil {
-		// Should be impossible given the //go:embed directive above.
-		panic(fmt.Sprintf("failed to create sub FS: %v", err))
-	}
+func buildHandler(appFS fs.FS, indexContent string) http.Handler {
 	fileServer := http.FileServer(http.FS(appFS))
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -75,29 +78,77 @@ func buildHandler(indexContent string) http.Handler {
 	})
 }
 
+func parsePort(flagPort int, env string) (int, error) {
+	if env == "" {
+		return flagPort, nil
+	}
+	p, err := strconv.Atoi(env)
+	if err != nil {
+		return 0, fmt.Errorf("PORT must be an integer, got %q: %w", env, err)
+	}
+	if p < 1 || p > 65535 {
+		return 0, fmt.Errorf("PORT must be in 1..65535, got %d", p)
+	}
+	return p, nil
+}
+
+func newServer(addr string, handler http.Handler) *http.Server {
+	return &http.Server{
+		Addr:              addr,
+		Handler:           handler,
+		ReadHeaderTimeout: 5 * time.Second,
+		ReadTimeout:       15 * time.Second,
+		WriteTimeout:      30 * time.Second,
+		IdleTimeout:       120 * time.Second,
+	}
+}
+
+func run(ctx context.Context, srv *http.Server) error {
+	errCh := make(chan error, 1)
+	go func() { errCh <- srv.ListenAndServe() }()
+	select {
+	case err := <-errCh:
+		if errors.Is(err, http.ErrServerClosed) {
+			return nil
+		}
+		return err
+	case <-ctx.Done():
+		shutdownCtx, cancel := context.WithTimeout(context.Background(), shutdownTimeout)
+		defer cancel()
+		return srv.Shutdown(shutdownCtx)
+	}
+}
+
 func main() {
-	port := flag.Int("port", 8080, "port to listen on")
+	portFlag := flag.Int("port", 8080, "port to listen on")
 	flag.Parse()
 
-	if p := os.Getenv("PORT"); p != "" {
-		fmt.Sscanf(p, "%d", port)
+	port, err := parsePort(*portFlag, os.Getenv("PORT"))
+	if err != nil {
+		slog.Error("invalid PORT", "err", err)
+		os.Exit(1)
 	}
 
 	appFS, err := fs.Sub(staticFiles, "app")
 	if err != nil {
-		log.Fatalf("failed to create sub FS: %v", err)
+		slog.Error("failed to create sub FS", "err", err)
+		os.Exit(1)
 	}
 
 	indexContent, err := prepareIndexContent(appFS)
 	if err != nil {
-		log.Fatalf("failed to read embedded index.html: %v", err)
+		slog.Error("failed to read embedded index.html", "err", err)
+		os.Exit(1)
 	}
 
-	http.Handle("/", buildHandler(indexContent))
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stop()
 
-	addr := fmt.Sprintf(":%d", *port)
-	log.Printf("FileKey listening on http://0.0.0.0%s", addr)
-	if err := http.ListenAndServe(addr, http.DefaultServeMux); err != nil {
-		log.Fatalf("server error: %v", err)
+	srv := newServer(fmt.Sprintf(":%d", port), buildHandler(appFS, indexContent))
+	slog.Info("FileKey listening", "addr", "http://0.0.0.0"+srv.Addr, "version", Version)
+	if err := run(ctx, srv); err != nil {
+		slog.Error("server error", "err", err)
+		os.Exit(1)
 	}
+	slog.Info("server stopped")
 }

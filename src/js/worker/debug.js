@@ -9,10 +9,3 @@ function fk_log(level, tag, msg, meta) {
     else if (FK_DEBUG)
         console.log(prefix, msg, meta !== undefined ? meta : '');
 }
-
-function fk_safe_buf(buf) {
-    if (buf === null || buf === undefined) return { type: String(buf) };
-    if (buf instanceof ArrayBuffer) return { type: 'ArrayBuffer', byteLength: buf.byteLength };
-    if (ArrayBuffer.isView(buf)) return { type: buf.constructor.name, byteLength: buf.byteLength };
-    return { type: typeof buf };
-}

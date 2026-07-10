@@ -3,10 +3,6 @@ var HEX_CHARS='0123456789abcdef'.split('');
 var KECCAK_PADDING=[1, 256, 65536, 16777216];
 var SHIFT=[0, 8, 16, 24];
 var RC=[1, 0, 32898, 0, 32906, 2147483648, 2147516416, 2147483648, 32907, 0, 2147483649, 0, 2147516545, 2147483648, 32777, 2147483648, 138, 0, 136, 0, 2147516425, 0, 2147483658, 0, 2147516555, 0, 139, 2147483648, 32905, 2147483648, 32771, 2147483648, 32770, 2147483648, 128, 2147483648, 32778, 0, 2147483658, 2147483648, 2147516545, 2147483648, 32896, 2147483648, 2147483649, 0, 2147516424, 2147483648];
-this.keccak256=keccak256;
-function keccak256(hex_str){
-return lazy_keccak(256, hex_str);
-}
 this.strict_hex_keccak256=strict_hex_keccak256;
 function strict_hex_keccak256(hex_str){
 return strict_hex_keccak(256, hex_str);
@@ -268,20 +264,6 @@ i+=2){
 var new_str=hex.slice(i, i+2);
 new_str=parseInt(new_str, 16);
 if(new_str > 255) return str_keccak(bits, hex);
-msg.push(new_str);
-}
-return keccak(bits, msg);
-}
-function lazy_keccak(bits, hex){
-if(hex.length % 2 !=0) return str_keccak(bits, hex);
-if(hex.slice(0, 2)=="0x") hex=hex.slice(2);
-var msg=[];
-for (var i=0;
-i < hex.length;
-i+=2){
-var new_str=hex.slice(i, i+2);
-new_str=parseInt(new_str, 16);
-if(isNaN(new_str) || new_str > 255) return str_keccak(bits, hex);
 msg.push(new_str);
 }
 return keccak(bits, msg);

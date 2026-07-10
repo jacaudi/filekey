@@ -61,9 +61,25 @@ jobs:
       setup-command: node scripts/build.js && cp -r app server/app
       artifact-name: test-results-go
 
+  test-web:
+    name: Test Web
+    uses: jacaudi/github-actions/.github/workflows/test.yml@v0.14.1
+    permissions:
+      contents: read
+    with:
+      test-framework: custom
+      working-directory: web
+      # setup-command runs from repo root (not working-directory), so cd into web/
+      # where package-lock.json lives; the reusable workflow does no auto npm install
+      # for the custom framework.
+      setup-command: cd web && npm ci
+      test-command: npm test
+      node-version: '22'
+      artifact-name: test-results-web
+
   release:
     name: Release
-    needs: [lint-go, lint-config, test-node, test-go]
+    needs: [lint-go, lint-config, test-node, test-go, test-web]
     uses: jacaudi/github-actions/.github/workflows/semantic-release.yml@v0.14.1
     permissions:
       contents: write

@@ -178,18 +178,6 @@ function std_newStatus(encrypted_status, status_count) {
         status_msg
     };
 }
-
-function createWebmLink(id, data) {
-    const blob = new Blob([data],{
-        type: 'video/webm'
-    });
-    const url = URL.createObjectURL(blob);
-    var file_ele = document.getElementById("file_id_" + id + "_blob");
-    file_ele.style.display = "block";
-    file_ele.addEventListener("click", function() {
-        var newTab = window.open(url, '_blank');
-    });
-}
 function newDownloadObj(filename, data, params={
     encrypted_status: true
 }, cb) {
@@ -205,13 +193,6 @@ function newDownloadObj(filename, data, params={
         createDownloadEle(new_dl_obj);
         cb();
     });
-}
-function checkIfViewableType(filename) {
-    var ext_slice = filename.slice(-4);
-    if ((ext_slice === "webm" || ext_slice === ".mp4"))
-        return true;
-    else
-        return false;
 }
 function handleSharedFile(file_obj) {
     var file_array = current_active_file_array;

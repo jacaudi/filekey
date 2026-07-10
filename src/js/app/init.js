@@ -12,9 +12,6 @@ let misc_msg_counter = 0;
 let main_inner;
 let drop_border_obj;
 let db_h;
-let tb_h = new topbar_ns_handler({
-    z_index: 2139002000
-});
 let modal_h = new fk_modal_handler();
 let webauthn_h;
 let swc = null;
@@ -81,21 +78,6 @@ function attachSendAddress(hex_pub, cb) {
 }
 function setVersionNumber() {
     document.getElementById("version_number_ele").innerText = local_version_number;
-}
-function sendSwMessage(data, cb) {
-    var msg_channel = new MessageChannel();
-    if (swc == null) {
-        fk_log('warn', 'sw', 'service worker not available');
-        return;
-    }
-    if (swc.state === 'activated') {
-        msg_channel.port1.onmessage = cb;
-        swc.postMessage(data, [msg_channel.port2]);
-    } else if (swc.state === 'redundant' && navigator.serviceWorker.controller.state != 'redundant') {
-        swc = navigator.serviceWorker.controller;
-        sendSwMessage(data, cb);
-    } else
-        fk_log('debug', 'sw', 'service worker state', swc.state);
 }
 function memTest() {
     if (performance.memory) {
