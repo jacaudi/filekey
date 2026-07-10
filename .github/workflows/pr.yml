@@ -52,7 +52,10 @@ jobs:
     with:
       test-framework: custom
       working-directory: web
-      setup-command: npm ci
+      # setup-command runs from repo root (not working-directory), so cd into web/
+      # where package-lock.json lives; the reusable workflow does no auto npm install
+      # for the custom framework.
+      setup-command: cd web && npm ci
       test-command: npm test
       node-version: '22'
       artifact-name: test-results-web
