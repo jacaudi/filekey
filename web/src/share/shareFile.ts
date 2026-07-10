@@ -52,13 +52,3 @@ export async function encryptForRecipient(
 export function sharedFileName(job: Pick<FileJob, 'name' | 'outName'>): string {
   return `${job.outName ?? job.name}.shared_filekey`;
 }
-
-/** <a download> save — always available on desktop (design §8.2). */
-export function saveBlob(blob: Blob, filename: string): void {
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-  a.click();
-  URL.revokeObjectURL(url);
-}

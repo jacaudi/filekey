@@ -36,10 +36,18 @@ export function MyShareKeyButton() {
     setUnlocking(true);
     // unlock() must be invoked synchronously inside the user gesture —
     // WebAuthn requires user activation (design §5.2).
-    unlock().then((ok) => {
-      setUnlocking(false);
-      if (!ok) setAuthFailed(true);
-    });
+    unlock()
+      .then((ok) => {
+        setUnlocking(false);
+        if (!ok) setAuthFailed(true);
+      })
+      .catch(() => {
+        // worker key-derivation rejection (prf_to_key/set_seed) is not caught
+        // by session.unlock() — route into the same inline retry as a failed
+        // unlock so the spinner never gets stuck (§9, no dead-end).
+        setUnlocking(false);
+        setAuthFailed(true);
+      });
   };
 
   const openCenter = () => {

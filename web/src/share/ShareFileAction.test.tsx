@@ -30,10 +30,11 @@ vi.mock('./shareFile', async (importOriginal) => {
   return {
     ...actual,
     encryptForRecipient: (...a: unknown[]) => encryptForRecipient(...a),
-    saveBlob: vi.fn(),
   };
 });
-import { saveBlob } from './shareFile';
+
+const downloadBlob = vi.fn();
+vi.mock('../files/save', () => ({ downloadBlob: (...a: unknown[]) => downloadBlob(...a) }));
 
 vi.mock('./RecipientsPane', () => ({
   AddRecipientControl: ({ onAdded }: { onAdded: (r: Recipient) => void }) => (
@@ -154,6 +155,18 @@ describe('picker flow', () => {
     expect(await within(dialog).findByRole('combobox')).toBeInTheDocument();
     expect(sessionMock.unlock).toHaveBeenCalledTimes(2);
   });
+
+  it('clears the spinner and shows inline retry when unlock() rejects (worker key-derivation failure)', async () => {
+    sessionMock.locked = true;
+    sessionMock.unlock.mockRejectedValueOnce(new Error('prf_to_key failed'));
+    renderAction();
+    const dialog = await openPicker();
+    expect(
+      await within(dialog).findByRole('button', { name: 'Try again' }),
+    ).toBeInTheDocument();
+    expect(within(dialog).getByText('Passkey authentication failed')).toBeInTheDocument();
+    expect(within(dialog).queryByLabelText('Waiting for passkey')).toBeNull();
+  });
 });
 
 describe('result actions — capability-detected ordering (D6, §8.2)', () => {
@@ -205,9 +218,7 @@ describe('result actions — capability-detected ordering (D6, §8.2)', () => {
     const saveBtn = within(dialog).getByRole('button', { name: 'Save' });
     expect(saveBtn.className).toContain('ant-btn-primary');
     fireEvent.click(saveBtn);
-    expect(saveBlob).toHaveBeenCalledTimes(1);
-    expect((saveBlob as ReturnType<typeof vi.fn>).mock.calls[0][1]).toBe(
-      'photo.jpg.shared_filekey',
-    );
+    expect(downloadBlob).toHaveBeenCalledTimes(1);
+    expect(downloadBlob.mock.calls[0][1]).toBe('photo.jpg.shared_filekey');
   });
 });

@@ -113,6 +113,18 @@ describe('lock gating', () => {
     ).toBeInTheDocument();
     expect(sessionMock.unlock).toHaveBeenCalledTimes(2);
   });
+
+  it('clears the spinner and shows inline retry when unlock() rejects (worker key-derivation failure)', async () => {
+    sessionMock.locked = true;
+    sessionMock.unlock.mockRejectedValueOnce(new Error('prf_to_key failed'));
+    renderCenter();
+    const dialog = await openCenter();
+    expect(
+      await within(dialog).findByRole('button', { name: 'Try again' }),
+    ).toBeInTheDocument();
+    expect(within(dialog).getByText('Passkey authentication failed')).toBeInTheDocument();
+    expect(within(dialog).queryByLabelText('Waiting for passkey')).toBeNull();
+  });
 });
 
 describe('My Key pane — capability-detected ordering (D6)', () => {

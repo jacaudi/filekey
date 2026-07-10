@@ -6,7 +6,8 @@ import type { FileJob } from '../files/ops';
 import { truncateKey } from './link';
 import { useInboundShare } from './inbound';
 import { AddRecipientControl } from './RecipientsPane';
-import { encryptForRecipient, saveBlob, sharedFileName } from './shareFile';
+import { encryptForRecipient, sharedFileName } from './shareFile';
+import { downloadBlob } from '../files/save';
 
 const NEW_RECIPIENT = '__new__';
 
@@ -29,10 +30,18 @@ export function ShareFileAction({ job }: { job: FileJob }) {
     setAuthFailed(false);
     setUnlocking(true);
     // WebAuthn must fire from the user gesture (design §5.2)
-    unlock().then((ok) => {
-      setUnlocking(false);
-      if (!ok) setAuthFailed(true);
-    });
+    unlock()
+      .then((ok) => {
+        setUnlocking(false);
+        if (!ok) setAuthFailed(true);
+      })
+      .catch(() => {
+        // worker key-derivation rejection (prf_to_key/set_seed) is not caught
+        // by session.unlock() — route into the same inline retry as a failed
+        // unlock so the spinner never gets stuck (§9, no dead-end).
+        setUnlocking(false);
+        setAuthFailed(true);
+      });
   };
 
   const openShare = () => {
@@ -129,7 +138,7 @@ export function ShareFileAction({ job }: { job: FileJob }) {
           <Button
             type={result.canShareFile ? 'default' : 'primary'}
             size="large"
-            onClick={() => saveBlob(result.blob, result.filename)}
+            onClick={() => downloadBlob(result.blob, result.filename)}
           >
             Save
           </Button>
