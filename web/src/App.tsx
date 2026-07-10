@@ -3,7 +3,8 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { rpc } from './crypto/client';
 import { hexToArrayBuffer } from './crypto/buffer';
 import { clearJobs as clearJobCache, requestPersistence, saveJob } from './files/db';
-import { processFiles, type FileJob } from './files/ops';
+import { jobStatusLabel, processFiles, type FileJob } from './files/ops';
+import { StatusAnnouncer } from './a11y/StatusAnnouncer';
 import { AppHeader } from './ui/AppHeader';
 import { DOCS, type DocKey } from './ui/content';
 import { DropZone } from './ui/DropZone';
@@ -96,6 +97,9 @@ export default function App() {
   return (
     <Layout style={{ minHeight: '100dvh' }}>
       <UpdatePrompt />
+      <StatusAnnouncer
+        jobs={jobs.map((j) => ({ id: j.id, name: j.name, status: jobStatusLabel(j) }))}
+      />
       <AppHeader
         locked={locked}
         onLock={() => void lock()}

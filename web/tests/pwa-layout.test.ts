@@ -38,4 +38,8 @@ describe('PWA layout rules', () => {
     expect(allCss).toContain('min-height: 44px')
     expect(allCss).toContain('min-width: 44px')
   })
+
+  it('honors prefers-reduced-motion globally', () => {
+    expect(allCss).toContain('@media (prefers-reduced-motion: reduce)')
+  })
 })
