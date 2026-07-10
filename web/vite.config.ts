@@ -46,7 +46,7 @@ export default defineConfig({
         ],
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,svg,png,webmanifest}'],
+        globPatterns: ['**/*.{js,css,html,svg,png,webmanifest,wasm}'],
         cleanupOutdatedCaches: true,
         clientsClaim: true,
         skipWaiting: false, // prompt-driven update: SW skips waiting only on user Reload
