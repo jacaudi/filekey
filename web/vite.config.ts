@@ -91,5 +91,11 @@ export default defineConfig({
     setupFiles: ['./tests/setup.ts'],
     include: ['tests/**/*.test.{ts,tsx}', 'src/**/*.test.{ts,tsx}', 'scripts/**/*.test.mjs'],
     testTimeout: 30000,
+    alias: {
+      'virtual:pwa-register/react': new URL(
+        './src/test/mocks/pwa-register-react.ts',
+        import.meta.url,
+      ).pathname,
+    },
   },
 });

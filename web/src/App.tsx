@@ -10,6 +10,7 @@ import { DropZone } from './ui/DropZone';
 import { FileList } from './ui/FileList';
 import { InfoModal } from './ui/InfoModal';
 import { Onboarding } from './ui/Onboarding';
+import { UpdatePrompt } from './pwa/UpdatePrompt';
 import { useSession } from './state/session';
 
 const PUB_RE = /^04[0-9a-fA-F]{264}$/;
@@ -94,6 +95,7 @@ export default function App() {
 
   return (
     <Layout style={{ minHeight: '100dvh' }}>
+      <UpdatePrompt />
       <AppHeader
         locked={locked}
         onLock={() => void lock()}
