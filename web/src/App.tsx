@@ -122,6 +122,8 @@ export default function App() {
           gap: 16,
           padding: 16,
           paddingBottom: 'max(16px, env(safe-area-inset-bottom))',
+          paddingLeft: 'max(16px, env(safe-area-inset-left))',
+          paddingRight: 'max(16px, env(safe-area-inset-right))',
         }}
       >
         {!ready ? (

@@ -1,0 +1,39 @@
+/* ---- PWA hardening (Phase 3) ---------------------------------------- */
+
+/* Dynamic viewport: the app shell always fills the *visible* viewport. */
+html,
+body,
+#root {
+  height: 100dvh;
+}
+
+/* Header padding moved off the inline style (fold R3) so the safe-area insets
+   actually apply. Base 8px/16px + top/left/right insets (notch, curved corners). */
+.fk-header {
+  padding: 8px 16px;
+  padding-top: max(8px, env(safe-area-inset-top, 0px));
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+
+/* antd Drawers: keep content out of the home-indicator / notch regions.
+   (These target antd's own classes — no inline padding to override.) */
+.ant-drawer .ant-drawer-body {
+  padding-bottom: max(24px, env(safe-area-inset-bottom, 0px));
+  padding-left: max(24px, env(safe-area-inset-left, 0px));
+  padding-right: max(24px, env(safe-area-inset-right, 0px));
+}
+
+/* Touch targets: >= 44px for header actions and menu items on touch devices.
+   (Design §4 keeps 32px controls for pointer-fine desktop.) */
+@media (pointer: coarse) {
+  .fk-header .ant-btn {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  .ant-dropdown-menu .ant-dropdown-menu-item,
+  .ant-drawer .ant-menu-item {
+    min-height: 44px;
+    align-items: center;
+  }
+}
