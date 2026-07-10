@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { describe, expect, it } from 'vitest';
 import { handleRequest, handlers } from '../src/crypto/worker/index';
 import { bufferToHex, combineArrayBuffers } from '../src/crypto/buffer';
