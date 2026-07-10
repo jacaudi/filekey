@@ -1,6 +1,5 @@
 server/filekey
 .worktrees/
-app/index.html
 server/app/
 web/node_modules/
 web/dist/
