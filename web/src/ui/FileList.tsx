@@ -1,12 +1,6 @@
 import { Button, List, Spin, Tag, Typography } from 'antd';
-import type { FileJob } from '../files/ops';
+import { jobStatusLabel, type FileJob } from '../files/ops';
 import { saveJob } from '../files/save';
-
-const DONE_LABEL: Record<FileJob['kind'], string> = {
-  plain: 'Encrypted',
-  encrypted: 'Decrypted',
-  shared: 'Decrypted',
-};
 
 const NEXT_STEP: Record<string, string> = {
   'wrong passkey/key': 'Check you authenticated with the passkey this file was encrypted for.',
@@ -15,13 +9,14 @@ const NEXT_STEP: Record<string, string> = {
 };
 
 function statusTag(job: FileJob) {
+  const label = jobStatusLabel(job);
   switch (job.status) {
     case 'processing':
-      return <Tag>Processing</Tag>;
+      return <Tag>{label}</Tag>;
     case 'done':
-      return <Tag color={job.kind === 'plain' ? 'blue' : 'green'}>{DONE_LABEL[job.kind]}</Tag>;
+      return <Tag color={job.kind === 'plain' ? 'blue' : 'green'}>{label}</Tag>;
     case 'error':
-      return <Tag color="red">Failed</Tag>;
+      return <Tag color="red">{label}</Tag>;
   }
 }
 

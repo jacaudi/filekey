@@ -3,13 +3,15 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { rpc } from './crypto/client';
 import { hexToArrayBuffer } from './crypto/buffer';
 import { clearJobs as clearJobCache, requestPersistence, saveJob } from './files/db';
-import { processFiles, type FileJob } from './files/ops';
+import { jobStatusLabel, processFiles, type FileJob } from './files/ops';
+import { StatusAnnouncer } from './a11y/StatusAnnouncer';
 import { AppHeader } from './ui/AppHeader';
 import { DOCS, type DocKey } from './ui/content';
 import { DropZone } from './ui/DropZone';
 import { FileList } from './ui/FileList';
 import { InfoModal } from './ui/InfoModal';
 import { Onboarding } from './ui/Onboarding';
+import { UpdatePrompt } from './pwa/UpdatePrompt';
 import { useSession } from './state/session';
 
 const PUB_RE = /^04[0-9a-fA-F]{264}$/;
@@ -94,6 +96,10 @@ export default function App() {
 
   return (
     <Layout style={{ minHeight: '100dvh' }}>
+      <UpdatePrompt />
+      <StatusAnnouncer
+        jobs={jobs.map((j) => ({ id: j.id, name: j.name, status: jobStatusLabel(j) }))}
+      />
       <AppHeader
         locked={locked}
         onLock={() => void lock()}
@@ -120,6 +126,8 @@ export default function App() {
           gap: 16,
           padding: 16,
           paddingBottom: 'max(16px, env(safe-area-inset-bottom))',
+          paddingLeft: 'max(16px, env(safe-area-inset-left))',
+          paddingRight: 'max(16px, env(safe-area-inset-right))',
         }}
       >
         {!ready ? (

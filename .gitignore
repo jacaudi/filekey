@@ -5,3 +5,6 @@ web/node_modules/
 web/dist/
 server/dist/*
 !server/dist/.gitkeep
+
+# Generated PWA icons (built by web/scripts/generate-icons.mjs on npm run build)
+web/public/icons/

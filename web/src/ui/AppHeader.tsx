@@ -53,12 +53,11 @@ export function AppHeader({ locked, onLock, onReset, onOpenDoc, version }: AppHe
 
   return (
     <header
+      className="fk-header"
       style={{
         display: 'flex',
         alignItems: 'center',
         gap: 12,
-        padding: '8px 16px',
-        paddingTop: 'max(8px, env(safe-area-inset-top))',
       }}
     >
       <Space>

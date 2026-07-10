@@ -1,4 +1,4 @@
-import { ConfigProvider, theme as antdTheme, type ThemeConfig } from 'antd';
+import { App as AntApp, ConfigProvider, theme as antdTheme, type ThemeConfig } from 'antd';
 import {
   createContext,
   useCallback,
@@ -65,7 +65,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
           algorithm: mode === 'dark' ? antdTheme.darkAlgorithm : antdTheme.defaultAlgorithm,
         }}
       >
-        {children}
+        <AntApp>{children}</AntApp>
       </ConfigProvider>
     </ThemeContext.Provider>
   );

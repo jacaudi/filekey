@@ -4,6 +4,11 @@ import { FileList } from './FileList';
 import type { FileJob } from '../files/ops';
 import * as save from '../files/save';
 
+// jobStatusLabel now pulls FileList through files/ops.ts, whose top-level import of
+// crypto/client constructs a real Worker on module load — mock it out like
+// files/ops.test.ts already does, since this suite only exercises label rendering.
+vi.mock('../crypto/client', () => ({ rpc: { call: vi.fn() } }));
+
 const done = (id: string, over: Partial<FileJob> = {}): FileJob => ({
   id,
   name: 'a.png',
