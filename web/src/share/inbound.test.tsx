@@ -120,4 +120,17 @@ describe('InboundShareBanner', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Dismiss' }));
     expect(onDismiss).toHaveBeenCalledTimes(1);
   });
+
+  it('renders as a full-width page banner', () => {
+    render(
+      <App>
+        <InboundShareBanner
+          share={{ pubHex: VALID_HEX, recipientName: 'Alice' }}
+          onSaved={vi.fn()}
+          onDismiss={vi.fn()}
+        />
+      </App>,
+    );
+    expect(document.querySelector('.ant-alert-banner')).not.toBeNull();
+  });
 });
