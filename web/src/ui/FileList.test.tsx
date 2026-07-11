@@ -97,4 +97,24 @@ describe('FileList', () => {
     const item = screen.getByRole('listitem');
     expect(within(item).queryByRole('button', { name: 'Share' })).toBeNull();
   });
+
+  it('titles the list card and shows a per-kind icon on each done row', () => {
+    render(
+      <FileList
+        jobs={[
+          done('1'), // kind: 'plain' → encrypted result → lock icon
+          done('2', { name: 'b.filekey', kind: 'encrypted', outName: 'b' }), // unlock icon
+        ]}
+      />,
+    );
+    expect(screen.getByText('Your files')).toBeInTheDocument();
+    const items = screen.getAllByRole('listitem');
+    expect(items[0].querySelector('.anticon-lock')).not.toBeNull();
+    expect(items[1].querySelector('.anticon-unlock')).not.toBeNull();
+  });
+
+  it('renders nothing when there are no jobs (no empty card)', () => {
+    const { container } = render(<FileList jobs={[]} />);
+    expect(container).toBeEmptyDOMElement();
+  });
 });

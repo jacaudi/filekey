@@ -1,5 +1,7 @@
-import { Button, List, Spin, Tag, Typography } from 'antd';
+import { Button, Card, List, Spin, Tag, Typography } from 'antd';
+import { LockOutlined, ShareAltOutlined, UnlockOutlined } from '@ant-design/icons';
 import { jobStatusLabel, type FileJob } from '../files/ops';
+import type { FileKind } from '../files/registry';
 import { saveJob } from '../files/save';
 import { ShareFileAction } from '../share/ShareFileAction';
 
@@ -7,6 +9,12 @@ const NEXT_STEP: Record<string, string> = {
   'wrong passkey/key': 'Check you authenticated with the passkey this file was encrypted for.',
   'not a FileKey file': 'This file is not in the FileKey format — check the file extension.',
   'encryption failed': 'Please try again.',
+};
+
+const KIND_ICON: Record<FileKind, JSX.Element> = {
+  plain: <LockOutlined />, // input plain → encrypted output
+  encrypted: <UnlockOutlined />, // input .filekey → decrypted output
+  shared: <ShareAltOutlined />,
 };
 
 function statusTag(job: FileJob) {
@@ -27,7 +35,7 @@ export function FileList({ jobs }: { jobs: FileJob[] }) {
   const failed = jobs.filter((j) => j.status === 'error').length;
 
   return (
-    <div>
+    <Card title="Your files" size="small">
       <Typography.Text type="secondary" aria-live="polite">
         {jobs.length} files · {doneJobs.length} done · {failed} failed
       </Typography.Text>
@@ -47,7 +55,7 @@ export function FileList({ jobs }: { jobs: FileJob[] }) {
           // one <li> per job (matching the brief's own test expectations).
           <List.Item>
             <List.Item.Meta
-              avatar={job.status === 'processing' ? <Spin size="small" /> : undefined}
+              avatar={job.status === 'processing' ? <Spin size="small" /> : KIND_ICON[job.kind]}
               title={job.status === 'done' ? job.outName : job.name}
               description={
                 job.status === 'error' ? (
@@ -70,6 +78,6 @@ export function FileList({ jobs }: { jobs: FileJob[] }) {
           </List.Item>
         )}
       />
-    </div>
+    </Card>
   );
 }
