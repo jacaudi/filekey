@@ -58,10 +58,11 @@ export function AppHeader({ locked, onLock, onReset, onOpenDoc, version }: AppHe
       style={{
         display: 'flex',
         alignItems: 'center',
+        flexWrap: 'wrap',
         gap: 12,
       }}
     >
-      <Space>
+      <Space style={{ flexShrink: 0, whiteSpace: 'nowrap' }}>
         <img src="/logo.svg" alt="" width={24} height={24} />
         <Typography.Text strong>FileKey</Typography.Text>
       </Space>

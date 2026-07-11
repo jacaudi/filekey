@@ -77,4 +77,11 @@ describe('AppHeader', () => {
       within(screen.getByRole('dialog')).getByRole('link', { name: /source code/i }),
     ).toHaveAttribute('href', 'https://github.com/jacaudi/filekey');
   });
+
+  it('guards the brand from wrapping and lets the header row wrap under crowding', () => {
+    renderHeader({ locked: false });
+    const brand = screen.getByText('FileKey').closest('.ant-space') as HTMLElement;
+    expect(brand).toHaveStyle({ whiteSpace: 'nowrap', flexShrink: '0' });
+    expect(screen.getByRole('banner')).toHaveStyle({ flexWrap: 'wrap' });
+  });
 });

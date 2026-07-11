@@ -215,6 +215,22 @@ describe('container by breakpoint', () => {
   });
 });
 
+describe('responsive collapse', () => {
+  it('collapses My Share Key to icon-only on narrow screens, full label on desktop', () => {
+    setViewport(false);
+    const { unmount } = renderCenter();
+    const compact = screen.getByRole('button', { name: 'My Share Key' });
+    expect(compact.textContent).toBe(''); // icon-only, no visible label
+    unmount();
+
+    setViewport(true);
+    renderCenter();
+    expect(screen.getByRole('button', { name: 'My Share Key' }).textContent).toContain(
+      'My Share Key',
+    );
+  });
+});
+
 describe('pane switching', () => {
   it('switches to the Recipients pane via the segmented control', async () => {
     renderCenter();

@@ -13,6 +13,7 @@ import {
   Spin,
   Typography,
 } from 'antd';
+import { KeyOutlined } from '@ant-design/icons';
 import { useSession } from '../state/session';
 import { useInboundShare } from './inbound';
 import { shareLink } from './link';
@@ -27,6 +28,8 @@ export function MyShareKeyButton() {
   const inbound = useInboundShare();
   const activePubHex = inbound?.pubHex ?? null;
   const { locked, unlock } = useSession();
+  const screens = Grid.useBreakpoint();
+  const compact = !screens.md;
   const [open, setOpen] = useState(false);
   const [unlocking, setUnlocking] = useState(false);
   const [authFailed, setAuthFailed] = useState(false);
@@ -58,8 +61,13 @@ export function MyShareKeyButton() {
 
   return (
     <>
-      <Button size="large" onClick={openCenter}>
-        My Share Key
+      <Button
+        size="large"
+        icon={<KeyOutlined aria-hidden />}
+        aria-label={compact ? 'My Share Key' : undefined}
+        onClick={openCenter}
+      >
+        {compact ? null : 'My Share Key'}
       </Button>
       <ShareCenter
         open={open}
