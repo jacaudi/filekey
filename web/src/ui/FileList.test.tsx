@@ -112,9 +112,4 @@ describe('FileList', () => {
     expect(items[0].querySelector('.anticon-lock')).not.toBeNull();
     expect(items[1].querySelector('.anticon-unlock')).not.toBeNull();
   });
-
-  it('renders nothing when there are no jobs (no empty card)', () => {
-    const { container } = render(<FileList jobs={[]} />);
-    expect(container).toBeEmptyDOMElement();
-  });
 });

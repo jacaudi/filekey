@@ -214,14 +214,9 @@ function MyKeyPane({ pubHex }: { pubHex: string }) {
 
   return (
     <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-      <div>
-        <Typography.Title level={5} style={{ margin: 0 }}>
-          My Share Key
-        </Typography.Title>
-        <Typography.Text type="secondary">
-          Share this link or QR so others can send you encrypted files.
-        </Typography.Text>
-      </div>
+      <Typography.Text type="secondary">
+        Share this link or QR so others can send you encrypted files.
+      </Typography.Text>
       {/* Two-column on the 720px desktop Modal (QR beside the actions, sized for
           scanning a monitor — §8.1); the narrow mobile Drawer wraps this into a
           single column. Actions come first in DOM order for a logical tab order. */}
@@ -229,7 +224,7 @@ function MyKeyPane({ pubHex }: { pubHex: string }) {
         <Space
           direction="vertical"
           size="large"
-          style={{ flex: '1 1 260px', minWidth: 260, maxWidth: 360 }}
+          style={{ flex: '0 1 auto', minWidth: 240, maxWidth: 360 }}
         >
           <Space wrap>
             {canWebShare ? (
