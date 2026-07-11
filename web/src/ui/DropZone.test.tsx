@@ -39,4 +39,10 @@ describe('DropZone', () => {
 
     await waitFor(() => expect(onFiles).toHaveBeenCalledWith([file]));
   });
+
+  it('shows guidance copy that still names the .filekey formats', () => {
+    render(<DropZone onFiles={vi.fn()} />);
+    expect(screen.getByText(/drop files anywhere to lock or unlock them/i)).toBeInTheDocument();
+    expect(screen.getByText(/\.filekey and \.shared_filekey files are decrypted/i)).toBeInTheDocument();
+  });
 });

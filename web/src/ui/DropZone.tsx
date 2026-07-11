@@ -43,9 +43,10 @@ export function DropZone({ onFiles }: { onFiles: (files: File[]) => void }) {
         <p className="ant-upload-drag-icon">
           <InboxOutlined />
         </p>
-        <p className="ant-upload-text">Drop files anywhere, click to pick, or paste</p>
+        <p className="ant-upload-text">Drop files anywhere to lock or unlock them</p>
         <p className="ant-upload-hint">
-          Plain files are encrypted; .filekey and .shared_filekey files are decrypted.
+          Click to pick or paste too. Plain files are encrypted; .filekey and .shared_filekey
+          files are decrypted.
         </p>
       </Upload.Dragger>
     </div>
