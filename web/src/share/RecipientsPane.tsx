@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { App, Button, Input, List, Modal, Popconfirm, Space, Typography } from 'antd';
+import { App, Button, Empty, Input, List, Modal, Popconfirm, Space, Typography } from 'antd';
 import {
   addRecipient,
   deleteRecipient,
@@ -120,12 +120,24 @@ export function RecipientsPane({ activePubHex }: { activePubHex: string | null }
   };
 
   return (
-    <Space direction="vertical" size="large" style={{ width: '100%' }}>
+    <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+      <div>
+        <Typography.Title level={5} style={{ margin: 0 }}>
+          Recipients
+        </Typography.Title>
+        <Typography.Text type="secondary">Stored only on this device.</Typography.Text>
+      </div>
       <AddRecipientControl activePubHex={activePubHex} onAdded={refresh} />
       <List
         dataSource={recipients}
         locale={{
-          emptyText: 'No saved recipients yet. Recipients are stored only on this device.',
+          emptyText: (
+            <Empty
+              image={Empty.PRESENTED_IMAGE_SIMPLE}
+              description="No saved recipients yet."
+              style={{ margin: '16px 0' }}
+            />
+          ),
         }}
         renderItem={(r) => (
           <List.Item

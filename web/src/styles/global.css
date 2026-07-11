@@ -7,6 +7,20 @@ body,
   height: 100dvh;
 }
 
+/* Zero the browser-default body margin so the dark app shell reaches every edge.
+   Without this, the 8px UA margin exposes the light browser canvas as a white
+   border in dark mode. color-scheme follows the app theme (theme.tsx sets
+   data-theme on <html>) so the canvas, scrollbars, and overscroll match too. */
+body {
+  margin: 0;
+}
+html[data-theme='light'] {
+  color-scheme: light;
+}
+html[data-theme='dark'] {
+  color-scheme: dark;
+}
+
 /* Header padding moved off the inline style (fold R3) so the safe-area insets
    actually apply. Base 8px/16px + top/left/right insets (notch, curved corners). */
 .fk-header {
@@ -14,6 +28,23 @@ body,
   padding-top: max(8px, env(safe-area-inset-top, 0px));
   padding-left: max(16px, env(safe-area-inset-left, 0px));
   padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+
+/* The persistent drop target fills the remaining column height (design §5.3).
+   Upload.Dragger applies its `flex:1` to the outer .ant-upload-wrapper, which is
+   not itself a flex container — so the dashed box stays content-height and leaves
+   an empty gap below it. Make the wrapper a flex column and stretch the dashed box
+   to fill it, so the drop zone occupies the whole area instead of floating at top. */
+[data-testid='fk-dropzone'] > .ant-upload-wrapper {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
+[data-testid='fk-dropzone'] .ant-upload.ant-upload-drag {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* antd Drawers: keep content out of the home-indicator / notch regions.

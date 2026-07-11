@@ -194,6 +194,15 @@ describe('My Key pane — capability-detected ordering (D6)', () => {
       expect(navigator.clipboard.writeText).toHaveBeenCalledWith(VALID_HEX),
     );
   });
+
+  it('shows the My Key explanation', async () => {
+    renderCenter();
+    const dialog = await openCenter();
+    await within(dialog).findByRole('button', { name: 'Copy link' });
+    expect(
+      screen.getByText(/share this link or qr so others can send you encrypted files/i),
+    ).toBeInTheDocument();
+  });
 });
 
 describe('container by breakpoint', () => {
@@ -212,6 +221,22 @@ describe('container by breakpoint', () => {
     fireEvent.click(screen.getByRole('button', { name: 'My Share Key' }));
     await waitFor(() => expect(document.querySelector('.ant-modal')).not.toBeNull());
     expect(document.querySelector('.ant-drawer-bottom')).toBeNull();
+  });
+});
+
+describe('responsive collapse', () => {
+  it('collapses My Share Key to icon-only on narrow screens, full label on desktop', () => {
+    setViewport(false);
+    const { unmount } = renderCenter();
+    const compact = screen.getByRole('button', { name: 'My Share Key' });
+    expect(compact.textContent).toBe(''); // icon-only, no visible label
+    unmount();
+
+    setViewport(true);
+    renderCenter();
+    expect(screen.getByRole('button', { name: 'My Share Key' }).textContent).toContain(
+      'My Share Key',
+    );
   });
 });
 

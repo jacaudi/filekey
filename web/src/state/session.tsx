@@ -38,7 +38,9 @@ export function newRpHandler(): WebAuthnHandler {
   return new WebAuthnHandler({ name: RP_NAME, id: rpId() });
 }
 
-const SessionContext = createContext<Session | null>(null);
+// Exported so the DEV-only UI preview harness (src/dev/) can inject a mock unlocked
+// session without a passkey. Production code uses <SessionProvider>/useSession only.
+export const SessionContext = createContext<Session | null>(null);
 
 export function SessionProvider({ children }: { children: ReactNode }) {
   const [locked, setLocked] = useState(true);

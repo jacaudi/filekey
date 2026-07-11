@@ -10,7 +10,9 @@ import QRCode from 'qrcode';
 export function ShareQr({ link }: { link: string }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [failed, setFailed] = useState(false);
-  const [size] = useState(() => Math.min(320, Math.floor(window.innerWidth * 0.8)));
+  // Smaller on phones (fits the bottom Drawer without scroll); larger on desktop
+  // where the QR is the primary desktop→phone hand-off.
+  const [size] = useState(() => Math.min(300, Math.floor(window.innerWidth * 0.6)));
 
   useEffect(() => {
     const canvas = canvasRef.current;

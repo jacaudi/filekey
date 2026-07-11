@@ -57,6 +57,7 @@ export function InboundShareBanner({
     <>
       <Alert
         type="info"
+        banner
         showIcon
         message={`Sharing to ${label}`}
         action={

@@ -41,14 +41,15 @@ describe('AppHeader', () => {
   it('shows the Locked tag and no Lock button when locked', () => {
     renderHeader({ locked: true });
     const banner = screen.getByRole('banner');
-    expect(within(banner).getByText('Locked')).toBeInTheDocument();
+    // the status tag is icon-only at the narrow test breakpoint; assert its label
+    expect(within(banner).getByLabelText('Locked')).toBeInTheDocument();
     expect(within(banner).queryByRole('button', { name: /^lock$/i })).toBeNull();
   });
 
   it('shows the Unlocked tag and a working Lock button when unlocked', () => {
     const { onLock } = renderHeader({ locked: false });
     const banner = screen.getByRole('banner');
-    expect(within(banner).getByText('Unlocked')).toBeInTheDocument();
+    expect(within(banner).getByLabelText('Unlocked')).toBeInTheDocument();
     fireEvent.click(within(banner).getByRole('button', { name: /^lock$/i }));
     expect(onLock).toHaveBeenCalledTimes(1);
   });
@@ -76,5 +77,12 @@ describe('AppHeader', () => {
     expect(
       within(screen.getByRole('dialog')).getByRole('link', { name: /source code/i }),
     ).toHaveAttribute('href', 'https://github.com/jacaudi/filekey');
+  });
+
+  it('guards the brand from wrapping and lets the header row wrap under crowding', () => {
+    renderHeader({ locked: false });
+    const brand = screen.getByText('FileKey').closest('.ant-space') as HTMLElement;
+    expect(brand).toHaveStyle({ whiteSpace: 'nowrap', flexShrink: '0' });
+    expect(screen.getByRole('banner')).toHaveStyle({ flexWrap: 'wrap' });
   });
 });

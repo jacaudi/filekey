@@ -1,4 +1,4 @@
-import { Alert, Button, Space, Steps, Typography } from 'antd';
+import { Alert, Button, Card, Space, Steps, theme, Typography } from 'antd';
 import { useEffect, useState } from 'react';
 import { newRpHandler, useSession } from '../state/session';
 import type { DocKey } from './content';
@@ -6,6 +6,7 @@ import type { DocKey } from './content';
 type Capability = 'checking' | 'ok' | 'no-platform' | 'unsupported';
 
 export function Onboarding({ onOpenDoc }: { onOpenDoc: (key: DocKey) => void }) {
+  const { token } = theme.useToken();
   const { locked, unlock } = useSession();
   const [capability, setCapability] = useState<Capability>('checking');
   const [created, setCreated] = useState(false);
@@ -60,85 +61,103 @@ export function Onboarding({ onOpenDoc }: { onOpenDoc: (key: DocKey) => void }) 
   );
 
   return (
-    <Space direction="vertical" size="large" style={{ width: '100%', maxWidth: 560 }}>
-      <Typography.Paragraph>
-        <strong>Files need protection. FileKey secures them.</strong> Works with passkeys. Drop
-        files in — they lock. Drop them again — they unlock. Your data stays on your device, and
-        only you hold the key. Open source and powered by AES-256 encryption.
-      </Typography.Paragraph>
-
-      {capability === 'unsupported' && (
-        <Alert
-          type="error"
-          showIcon
-          role="alert"
-          message="This browser doesn't support passkeys (WebAuthn)"
-          description={
-            <>
-              FileKey needs a browser with WebAuthn and the PRF extension — Chrome ≥112, Edge
-              ≥112, or Safari ≥17. {seeRequirements}
-            </>
-          }
-        />
-      )}
-      {capability === 'no-platform' && (
-        <Alert
-          type="info"
-          showIcon
-          role="alert"
-          message="No built-in authenticator detected"
-          description={
-            <>
-              You can still use a hardware security key that supports FIDO2 + PRF (e.g. a YubiKey
-              5). {seeRequirements}
-            </>
-          }
-        />
-      )}
-      {error && (
-        <Alert
-          type="error"
-          showIcon
-          role="alert"
-          message={error}
-          description={seeRequirements}
-        />
-      )}
-
-      <Steps
-        current={current}
-        items={[
-          { title: 'Create passkey' },
-          { title: 'Authenticate' },
-          { title: 'Ready' },
-        ]}
-      />
-
-      {current === 0 && (
-        <Space>
-          <Button
-            type="primary"
-            loading={busy}
-            disabled={capability === 'unsupported'}
-            onClick={handleCreate}
-          >
-            Create passkey
-          </Button>
-          <Button loading={busy} disabled={capability === 'unsupported'} onClick={handleAuthenticate}>
-            Already have a FileKey? Authenticate
-          </Button>
+    <Card style={{ width: '100%', maxWidth: 560, margin: '0 auto' }}>
+      <Space direction="vertical" size="large" style={{ width: '100%' }}>
+        <Space align="center" size="middle">
+          <img src="/logo.svg" alt="" width={40} height={40} />
+          <div>
+            <Typography.Title level={4} style={{ margin: 0, color: token.colorPrimary }}>
+              FileKey
+            </Typography.Title>
+            <Typography.Text type="secondary">
+              Your files, locked to your passkey.
+            </Typography.Text>
+          </div>
         </Space>
-      )}
-      {current === 1 && (
-        <Button type="primary" loading={busy} onClick={handleAuthenticate}>
-          Authenticate
-        </Button>
-      )}
-      {current === 2 && (
-        <Typography.Paragraph>
-          You're ready — drop files anywhere to encrypt or decrypt them.
+
+        <Typography.Paragraph style={{ margin: 0 }}>
+          <strong>Files need protection. FileKey secures them.</strong> Works with passkeys. Drop
+          files in — they lock. Drop them again — they unlock. Your data stays on your device, and
+          only you hold the key. Open source and powered by AES-256 encryption.
         </Typography.Paragraph>
-      )}
-    </Space>
+
+        {capability === 'unsupported' && (
+          <Alert
+            type="error"
+            showIcon
+            role="alert"
+            message="This browser doesn't support passkeys (WebAuthn)"
+            description={
+              <>
+                FileKey needs a browser with WebAuthn and the PRF extension — Chrome ≥112, Edge
+                ≥112, or Safari ≥17. {seeRequirements}
+              </>
+            }
+          />
+        )}
+        {capability === 'no-platform' && (
+          <Alert
+            type="info"
+            showIcon
+            role="alert"
+            message="No built-in authenticator detected"
+            description={
+              <>
+                You can still use a hardware security key that supports FIDO2 + PRF (e.g. a
+                YubiKey 5). {seeRequirements}
+              </>
+            }
+          />
+        )}
+        {error && (
+          <Alert
+            type="error"
+            showIcon
+            role="alert"
+            message={error}
+            description={seeRequirements}
+          />
+        )}
+
+        <Steps
+          current={current}
+          items={[
+            { title: 'Create passkey' },
+            { title: 'Authenticate' },
+            { title: 'Ready' },
+          ]}
+        />
+
+        {current === 0 && (
+          <Space>
+            <Button
+              type="primary"
+              loading={busy}
+              disabled={capability === 'unsupported'}
+              onClick={handleCreate}
+            >
+              Create passkey
+            </Button>
+            <Button
+              loading={busy}
+              disabled={capability === 'unsupported'}
+              onClick={handleAuthenticate}
+            >
+              Already have a FileKey? Authenticate
+            </Button>
+          </Space>
+        )}
+        {current === 1 && (
+          <Button type="primary" loading={busy} onClick={handleAuthenticate}>
+            Authenticate
+          </Button>
+        )}
+        {current === 2 && (
+          <Typography.Paragraph>
+            You're ready — drop files anywhere to encrypt or decrypt them.
+          </Typography.Paragraph>
+        )}
+      </Space>
+    </Card>
   );
 }

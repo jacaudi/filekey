@@ -89,7 +89,7 @@ describe('App', () => {
 
     fireEvent.click(screen.getByRole('button', { name: /already have a filekey/i }));
     await screen.findByTestId('fk-dropzone');
-    expect(within(screen.getByRole('banner')).getByText('Unlocked')).toBeInTheDocument();
+    expect(within(screen.getByRole('banner')).getByLabelText('Unlocked')).toBeInTheDocument();
 
     // Reset: menu → Reset → clears keys + cache and replays onboarding
     fireEvent.click(screen.getByRole('button', { name: /open menu/i }));
@@ -98,5 +98,18 @@ describe('App', () => {
     expect(vi.mocked(clearJobs).mock.calls.length).toBeGreaterThanOrEqual(2);
     // Back on onboarding — scope to the button (see the init test's note).
     await screen.findByRole('button', { name: /create passkey/i });
+  });
+
+  it('centers content in a max-width shell that wraps the drop zone', async () => {
+    getCred.mockResolvedValue({
+      key_mat: new Uint8Array(64).buffer,
+      cred_id: new Uint8Array(16).buffer,
+    });
+    renderApp();
+    fireEvent.click(screen.getByRole('button', { name: /already have a filekey/i }));
+    const dropzone = await screen.findByTestId('fk-dropzone');
+    const shell = screen.getByTestId('fk-content');
+    expect(shell).toContainElement(dropzone);
+    expect(shell).toHaveStyle({ maxWidth: '760px' });
   });
 });

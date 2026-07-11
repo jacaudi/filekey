@@ -33,11 +33,13 @@ function appVersion(): string {
   return document.querySelector('meta[name="app-version"]')?.getAttribute('content') ?? 'dev';
 }
 
-export default function App() {
+// `initialJobs` is an optional seam for tests and the DEV-only UI preview harness to
+// render the file list with fixtures. Production (`main.tsx`) renders <App/> with none.
+export default function App({ initialJobs = [] }: { initialJobs?: FileJob[] } = {}) {
   const { message } = AntApp.useApp();
   const { locked, unlock, lock } = useSession();
   const [ready, setReady] = useState(false);
-  const [jobs, setJobs] = useState<FileJob[]>([]);
+  const [jobs, setJobs] = useState<FileJob[]>(initialJobs);
   const [openDoc, setOpenDoc] = useState<DocKey | null>(null);
   const [inbound, setInbound] = useState<InboundShare | null>(null);
 
@@ -128,21 +130,33 @@ export default function App() {
           style={{
             display: 'flex',
             flexDirection: 'column',
-            gap: 16,
             padding: 16,
             paddingBottom: 'max(16px, env(safe-area-inset-bottom))',
             paddingLeft: 'max(16px, env(safe-area-inset-left))',
             paddingRight: 'max(16px, env(safe-area-inset-right))',
           }}
         >
-          {!ready ? (
-            <Onboarding onOpenDoc={setOpenDoc} />
-          ) : (
-            <>
-              <FileList jobs={jobs} />
-              <DropZone onFiles={(files) => void handleFiles(files)} />
-            </>
-          )}
+          <div
+            data-testid="fk-content"
+            style={{
+              width: '100%',
+              maxWidth: 760,
+              margin: '0 auto',
+              flex: 1,
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 16,
+            }}
+          >
+            {!ready ? (
+              <Onboarding onOpenDoc={setOpenDoc} />
+            ) : (
+              <>
+                <FileList jobs={jobs} />
+                <DropZone onFiles={(files) => void handleFiles(files)} />
+              </>
+            )}
+          </div>
         </Layout.Content>
         <InfoModal
           title={openDoc ? DOC_TITLES[openDoc] : ''}

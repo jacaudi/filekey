@@ -15,10 +15,18 @@ describe('DOCS single-sourcing', () => {
 describe('InfoModal', () => {
   it('renders markdown content inside an antd modal', () => {
     render(
-      <InfoModal title="How FileKey Works" markdown={'# Hello\n\nSome **body** text'} open onClose={() => {}} />,
+      <InfoModal
+        title="How FileKey Works"
+        markdown={'# Title Line\n\n## Section\n\nSome **body** text'}
+        open
+        onClose={() => {}}
+      />,
     );
     const dialog = screen.getByRole('dialog');
-    expect(within(dialog).getByRole('heading', { name: 'Hello' })).toBeInTheDocument();
+    // the markdown's own top-level h1 is dropped (the Modal chrome title names it)
+    expect(within(dialog).queryByRole('heading', { name: 'Title Line' })).toBeNull();
+    // deeper headings and body still render
+    expect(within(dialog).getByRole('heading', { name: 'Section' })).toBeInTheDocument();
     expect(within(dialog).getByText('body')).toBeInTheDocument();
   });
 

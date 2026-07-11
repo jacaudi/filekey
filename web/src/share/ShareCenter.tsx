@@ -13,6 +13,7 @@ import {
   Spin,
   Typography,
 } from 'antd';
+import { KeyOutlined } from '@ant-design/icons';
 import { useSession } from '../state/session';
 import { useInboundShare } from './inbound';
 import { shareLink } from './link';
@@ -27,6 +28,8 @@ export function MyShareKeyButton() {
   const inbound = useInboundShare();
   const activePubHex = inbound?.pubHex ?? null;
   const { locked, unlock } = useSession();
+  const screens = Grid.useBreakpoint();
+  const compact = !screens.md;
   const [open, setOpen] = useState(false);
   const [unlocking, setUnlocking] = useState(false);
   const [authFailed, setAuthFailed] = useState(false);
@@ -58,8 +61,13 @@ export function MyShareKeyButton() {
 
   return (
     <>
-      <Button size="large" onClick={openCenter}>
-        My Share Key
+      <Button
+        size="large"
+        icon={<KeyOutlined aria-hidden />}
+        aria-label={compact ? 'My Share Key' : undefined}
+        onClick={openCenter}
+      >
+        {compact ? null : 'My Share Key'}
       </Button>
       <ShareCenter
         open={open}
@@ -182,6 +190,8 @@ function ShareCenterBody({
 
 function MyKeyPane({ pubHex }: { pubHex: string }) {
   const { message } = App.useApp();
+  const screens = Grid.useBreakpoint();
+  const isMobile = !screens.md;
   const link = shareLink(pubHex);
   const canWebShare = typeof navigator.share === 'function';
 
@@ -205,51 +215,74 @@ function MyKeyPane({ pubHex }: { pubHex: string }) {
   };
 
   return (
-    // Two-column on the 720px desktop Modal (QR beside the actions, sized for
-    // scanning a monitor — §8.1); the narrow mobile Drawer wraps this into a
-    // single column. Actions come first in DOM order for a logical tab order.
-    <Flex wrap gap="large" align="flex-start">
-      <Space direction="vertical" size="large" style={{ flex: 1, minWidth: 260 }}>
-        <Space wrap>
-          {canWebShare ? (
-            <>
-              <Button type="primary" size="large" onClick={shareViaSheet}>
-                Share my link
-              </Button>
-              <Button size="large" onClick={copyLink}>
+    <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+      <Typography.Text type="secondary">
+        Share this link or QR so others can send you encrypted files.
+      </Typography.Text>
+      {/* Two-column on the 720px desktop Modal (QR beside the actions, sized for
+          scanning a monitor — §8.1); the narrow mobile Drawer wraps this into a
+          single column. Actions come first in DOM order for a logical tab order. */}
+      <Flex wrap gap="large" align="flex-start" justify="center">
+        <Space
+          direction="vertical"
+          size="large"
+          style={{
+            flex: '0 1 auto',
+            minWidth: 240,
+            maxWidth: isMobile ? undefined : 360,
+            width: isMobile ? '100%' : undefined,
+          }}
+        >
+          <Space
+            direction={isMobile ? 'vertical' : 'horizontal'}
+            wrap
+            style={{ width: isMobile ? '100%' : undefined }}
+          >
+            {canWebShare ? (
+              <>
+                <Button type="primary" size="large" block={isMobile} onClick={shareViaSheet}>
+                  Share my link
+                </Button>
+                <Button size="large" block={isMobile} onClick={copyLink}>
+                  Copy link
+                </Button>
+              </>
+            ) : (
+              // copy-first ordering when Web Share is absent (D6, §8.1)
+              <Button type="primary" size="large" block={isMobile} onClick={copyLink}>
                 Copy link
               </Button>
-            </>
-          ) : (
-            // copy-first ordering when Web Share is absent (D6, §8.1)
-            <Button type="primary" size="large" onClick={copyLink}>
-              Copy link
-            </Button>
-          )}
+            )}
+          </Space>
+          <Collapse
+            ghost
+            items={[
+              {
+                key: 'raw',
+                label: 'Raw key',
+                children: (
+                  <Space direction="vertical" style={{ width: '100%' }}>
+                    <Typography.Text
+                      style={{ wordBreak: 'break-all', fontFamily: 'monospace' }}
+                    >
+                      {pubHex}
+                    </Typography.Text>
+                    <Button size="large" onClick={copyRawKey}>
+                      Copy raw key
+                    </Button>
+                  </Space>
+                ),
+              },
+            ]}
+          />
         </Space>
-        <Collapse
-          ghost
-          items={[
-            {
-              key: 'raw',
-              label: 'Raw key',
-              children: (
-                <Space direction="vertical" style={{ width: '100%' }}>
-                  <Typography.Text
-                    style={{ wordBreak: 'break-all', fontFamily: 'monospace' }}
-                  >
-                    {pubHex}
-                  </Typography.Text>
-                  <Button size="large" onClick={copyRawKey}>
-                    Copy raw key
-                  </Button>
-                </Space>
-              ),
-            },
-          ]}
-        />
-      </Space>
-      <ShareQr link={link} />
-    </Flex>
+        <Space direction="vertical" align="center" size="small">
+          <ShareQr link={link} />
+          <Typography.Text type="secondary">
+            Scan to open FileKey with your key attached
+          </Typography.Text>
+        </Space>
+      </Flex>
+    </Space>
   );
 }

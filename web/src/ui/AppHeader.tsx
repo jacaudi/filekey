@@ -1,4 +1,10 @@
-import { LockOutlined, MenuOutlined, MoonOutlined, SunOutlined } from '@ant-design/icons';
+import {
+  LockOutlined,
+  MenuOutlined,
+  MoonOutlined,
+  SunOutlined,
+  UnlockOutlined,
+} from '@ant-design/icons';
 import { Button, Drawer, Dropdown, Grid, Menu, Space, Tag, Typography } from 'antd';
 import { useState } from 'react';
 import { useTheme } from '../theme';
@@ -21,8 +27,6 @@ export function AppHeader({ locked, onLock, onReset, onOpenDoc, version }: AppHe
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   const items = [
-    { key: 'reset', label: 'Reset' },
-    { type: 'divider' as const },
     { key: 'howItWorks', label: 'How it Works' },
     { key: 'terms', label: 'Terms' },
     { key: 'privacy', label: 'Privacy' },
@@ -43,6 +47,10 @@ export function AppHeader({ locked, onLock, onReset, onOpenDoc, version }: AppHe
       ),
     },
     { type: 'divider' as const },
+    // Destructive action (wipes session + files + saved recipients): kept last and
+    // danger-styled so it isn't the first thing the pointer lands on.
+    { key: 'reset', label: 'Reset', danger: true },
+    { type: 'divider' as const },
     { key: 'version', label: version, disabled: true },
   ];
 
@@ -58,16 +66,24 @@ export function AppHeader({ locked, onLock, onReset, onOpenDoc, version }: AppHe
       style={{
         display: 'flex',
         alignItems: 'center',
-        gap: 12,
+        flexWrap: 'wrap',
+        gap: screens.md ? 12 : 8,
       }}
     >
-      <Space>
+      <Space style={{ flexShrink: 0, whiteSpace: 'nowrap' }}>
         <img src="/logo.svg" alt="" width={24} height={24} />
         <Typography.Text strong>FileKey</Typography.Text>
       </Space>
       <span style={{ flex: 1 }} />
-      <Tag icon={locked ? <LockOutlined /> : undefined} color={locked ? 'default' : 'green'}>
-        {locked ? 'Locked' : 'Unlocked'}
+      {/* Icon-only on narrow screens (the icon + green tint carry the state) so the
+          action cluster stays on one row; full label on desktop. */}
+      <Tag
+        icon={locked ? <LockOutlined /> : <UnlockOutlined />}
+        color={locked ? 'default' : 'green'}
+        aria-label={locked ? 'Locked' : 'Unlocked'}
+        style={screens.md ? undefined : { marginInlineEnd: 0 }}
+      >
+        {screens.md ? (locked ? 'Locked' : 'Unlocked') : null}
       </Tag>
       {!locked && (
         <Button size="small" onClick={onLock}>
