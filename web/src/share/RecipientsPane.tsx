@@ -120,7 +120,7 @@ export function RecipientsPane({ activePubHex }: { activePubHex: string | null }
   };
 
   return (
-    <Space direction="vertical" size="large" style={{ width: '100%' }}>
+    <Space direction="vertical" size="middle" style={{ width: '100%' }}>
       <div>
         <Typography.Title level={5} style={{ margin: 0 }}>
           Recipients
@@ -135,6 +135,7 @@ export function RecipientsPane({ activePubHex }: { activePubHex: string | null }
             <Empty
               image={Empty.PRESENTED_IMAGE_SIMPLE}
               description="No saved recipients yet."
+              style={{ margin: '16px 0' }}
             />
           ),
         }}

@@ -25,7 +25,7 @@ describe('ShareQr', () => {
     ];
     expect(canvasArg).toBe(canvas);
     expect(text).toBe(LINK); // the DEEP LINK, never raw hex
-    expect(opts.width).toBe(Math.min(320, Math.floor(window.innerWidth * 0.8)));
+    expect(opts.width).toBe(Math.min(300, Math.floor(window.innerWidth * 0.6)));
   });
 
   it('falls back to the copyable link text when rendering fails', async () => {

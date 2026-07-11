@@ -190,6 +190,8 @@ function ShareCenterBody({
 
 function MyKeyPane({ pubHex }: { pubHex: string }) {
   const { message } = App.useApp();
+  const screens = Grid.useBreakpoint();
+  const isMobile = !screens.md;
   const link = shareLink(pubHex);
   const canWebShare = typeof navigator.share === 'function';
 
@@ -224,21 +226,30 @@ function MyKeyPane({ pubHex }: { pubHex: string }) {
         <Space
           direction="vertical"
           size="large"
-          style={{ flex: '0 1 auto', minWidth: 240, maxWidth: 360 }}
+          style={{
+            flex: '0 1 auto',
+            minWidth: 240,
+            maxWidth: isMobile ? undefined : 360,
+            width: isMobile ? '100%' : undefined,
+          }}
         >
-          <Space wrap>
+          <Space
+            direction={isMobile ? 'vertical' : 'horizontal'}
+            wrap
+            style={{ width: isMobile ? '100%' : undefined }}
+          >
             {canWebShare ? (
               <>
-                <Button type="primary" size="large" onClick={shareViaSheet}>
+                <Button type="primary" size="large" block={isMobile} onClick={shareViaSheet}>
                   Share my link
                 </Button>
-                <Button size="large" onClick={copyLink}>
+                <Button size="large" block={isMobile} onClick={copyLink}>
                   Copy link
                 </Button>
               </>
             ) : (
               // copy-first ordering when Web Share is absent (D6, §8.1)
-              <Button type="primary" size="large" onClick={copyLink}>
+              <Button type="primary" size="large" block={isMobile} onClick={copyLink}>
                 Copy link
               </Button>
             )}

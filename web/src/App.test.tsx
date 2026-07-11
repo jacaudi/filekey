@@ -89,7 +89,7 @@ describe('App', () => {
 
     fireEvent.click(screen.getByRole('button', { name: /already have a filekey/i }));
     await screen.findByTestId('fk-dropzone');
-    expect(within(screen.getByRole('banner')).getByText('Unlocked')).toBeInTheDocument();
+    expect(within(screen.getByRole('banner')).getByLabelText('Unlocked')).toBeInTheDocument();
 
     // Reset: menu → Reset → clears keys + cache and replays onboarding
     fireEvent.click(screen.getByRole('button', { name: /open menu/i }));
