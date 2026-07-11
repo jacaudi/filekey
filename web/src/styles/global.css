@@ -30,6 +30,23 @@ html[data-theme='dark'] {
   padding-right: max(16px, env(safe-area-inset-right, 0px));
 }
 
+/* The persistent drop target fills the remaining column height (design §5.3).
+   Upload.Dragger applies its `flex:1` to the outer .ant-upload-wrapper, which is
+   not itself a flex container — so the dashed box stays content-height and leaves
+   an empty gap below it. Make the wrapper a flex column and stretch the dashed box
+   to fill it, so the drop zone occupies the whole area instead of floating at top. */
+[data-testid='fk-dropzone'] > .ant-upload-wrapper {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
+[data-testid='fk-dropzone'] .ant-upload.ant-upload-drag {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 /* antd Drawers: keep content out of the home-indicator / notch regions.
    (These target antd's own classes — no inline padding to override.) */
 .ant-drawer .ant-drawer-body {
