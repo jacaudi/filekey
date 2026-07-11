@@ -65,6 +65,16 @@ describe('list', () => {
     const item = (await screen.findByText('Alice')).closest('li') as HTMLElement;
     expect(within(item).getByText('04a1…a1b2')).toBeInTheDocument();
   });
+
+  it('shows the Recipients heading, on-device helper copy, and an Empty state', async () => {
+    db.listRecipients.mockResolvedValue([]);
+    renderPane();
+    expect(screen.getByRole('heading', { name: /recipients/i })).toBeInTheDocument();
+    expect(screen.getByText(/stored only on this device/i)).toBeInTheDocument();
+    expect(await screen.findByText(/no saved recipients yet/i)).toBeInTheDocument();
+    // antd Empty renders its presentation node
+    expect(document.querySelector('.ant-empty')).not.toBeNull();
+  });
 });
 
 describe('add — validated paste field', () => {
