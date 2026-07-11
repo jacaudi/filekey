@@ -128,21 +128,33 @@ export default function App() {
           style={{
             display: 'flex',
             flexDirection: 'column',
-            gap: 16,
             padding: 16,
             paddingBottom: 'max(16px, env(safe-area-inset-bottom))',
             paddingLeft: 'max(16px, env(safe-area-inset-left))',
             paddingRight: 'max(16px, env(safe-area-inset-right))',
           }}
         >
-          {!ready ? (
-            <Onboarding onOpenDoc={setOpenDoc} />
-          ) : (
-            <>
-              <FileList jobs={jobs} />
-              <DropZone onFiles={(files) => void handleFiles(files)} />
-            </>
-          )}
+          <div
+            data-testid="fk-content"
+            style={{
+              width: '100%',
+              maxWidth: 760,
+              margin: '0 auto',
+              flex: 1,
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 16,
+            }}
+          >
+            {!ready ? (
+              <Onboarding onOpenDoc={setOpenDoc} />
+            ) : (
+              <>
+                <FileList jobs={jobs} />
+                <DropZone onFiles={(files) => void handleFiles(files)} />
+              </>
+            )}
+          </div>
         </Layout.Content>
         <InfoModal
           title={openDoc ? DOC_TITLES[openDoc] : ''}
