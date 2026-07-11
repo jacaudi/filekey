@@ -213,51 +213,70 @@ function MyKeyPane({ pubHex }: { pubHex: string }) {
   };
 
   return (
-    // Two-column on the 720px desktop Modal (QR beside the actions, sized for
-    // scanning a monitor — §8.1); the narrow mobile Drawer wraps this into a
-    // single column. Actions come first in DOM order for a logical tab order.
-    <Flex wrap gap="large" align="flex-start">
-      <Space direction="vertical" size="large" style={{ flex: 1, minWidth: 260 }}>
-        <Space wrap>
-          {canWebShare ? (
-            <>
-              <Button type="primary" size="large" onClick={shareViaSheet}>
-                Share my link
-              </Button>
-              <Button size="large" onClick={copyLink}>
+    <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+      <div>
+        <Typography.Title level={5} style={{ margin: 0 }}>
+          My Share Key
+        </Typography.Title>
+        <Typography.Text type="secondary">
+          Share this link or QR so others can send you encrypted files.
+        </Typography.Text>
+      </div>
+      {/* Two-column on the 720px desktop Modal (QR beside the actions, sized for
+          scanning a monitor — §8.1); the narrow mobile Drawer wraps this into a
+          single column. Actions come first in DOM order for a logical tab order. */}
+      <Flex wrap gap="large" align="flex-start" justify="center">
+        <Space
+          direction="vertical"
+          size="large"
+          style={{ flex: '1 1 260px', minWidth: 260, maxWidth: 360 }}
+        >
+          <Space wrap>
+            {canWebShare ? (
+              <>
+                <Button type="primary" size="large" onClick={shareViaSheet}>
+                  Share my link
+                </Button>
+                <Button size="large" onClick={copyLink}>
+                  Copy link
+                </Button>
+              </>
+            ) : (
+              // copy-first ordering when Web Share is absent (D6, §8.1)
+              <Button type="primary" size="large" onClick={copyLink}>
                 Copy link
               </Button>
-            </>
-          ) : (
-            // copy-first ordering when Web Share is absent (D6, §8.1)
-            <Button type="primary" size="large" onClick={copyLink}>
-              Copy link
-            </Button>
-          )}
+            )}
+          </Space>
+          <Collapse
+            ghost
+            items={[
+              {
+                key: 'raw',
+                label: 'Raw key',
+                children: (
+                  <Space direction="vertical" style={{ width: '100%' }}>
+                    <Typography.Text
+                      style={{ wordBreak: 'break-all', fontFamily: 'monospace' }}
+                    >
+                      {pubHex}
+                    </Typography.Text>
+                    <Button size="large" onClick={copyRawKey}>
+                      Copy raw key
+                    </Button>
+                  </Space>
+                ),
+              },
+            ]}
+          />
         </Space>
-        <Collapse
-          ghost
-          items={[
-            {
-              key: 'raw',
-              label: 'Raw key',
-              children: (
-                <Space direction="vertical" style={{ width: '100%' }}>
-                  <Typography.Text
-                    style={{ wordBreak: 'break-all', fontFamily: 'monospace' }}
-                  >
-                    {pubHex}
-                  </Typography.Text>
-                  <Button size="large" onClick={copyRawKey}>
-                    Copy raw key
-                  </Button>
-                </Space>
-              ),
-            },
-          ]}
-        />
-      </Space>
-      <ShareQr link={link} />
-    </Flex>
+        <Space direction="vertical" align="center" size="small">
+          <ShareQr link={link} />
+          <Typography.Text type="secondary">
+            Scan to open FileKey with your key attached
+          </Typography.Text>
+        </Space>
+      </Flex>
+    </Space>
   );
 }

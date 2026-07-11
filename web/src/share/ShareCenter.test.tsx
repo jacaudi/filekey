@@ -194,6 +194,16 @@ describe('My Key pane — capability-detected ordering (D6)', () => {
       expect(navigator.clipboard.writeText).toHaveBeenCalledWith(VALID_HEX),
     );
   });
+
+  it('shows the My Key heading and explanation', async () => {
+    renderCenter();
+    const dialog = await openCenter();
+    await within(dialog).findByRole('button', { name: 'Copy link' });
+    expect(screen.getByRole('heading', { name: /my share key/i })).toBeInTheDocument();
+    expect(
+      screen.getByText(/share this link or qr so others can send you encrypted files/i),
+    ).toBeInTheDocument();
+  });
 });
 
 describe('container by breakpoint', () => {
