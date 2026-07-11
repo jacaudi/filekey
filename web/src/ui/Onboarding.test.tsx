@@ -117,4 +117,11 @@ describe('Onboarding', () => {
     await waitFor(() => expect(getCred).toHaveBeenCalledTimes(1));
     await screen.findByText(/you're ready/i);
   });
+
+  it('renders the brand hero lockup with a static tagline', () => {
+    renderOnboarding();
+    expect(screen.getByText(/your files, locked to your passkey/i)).toBeInTheDocument();
+    // hero heading uses the brand name, distinct from the Steps titles
+    expect(screen.getByRole('heading', { name: 'FileKey' })).toBeInTheDocument();
+  });
 });
