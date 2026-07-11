@@ -33,11 +33,13 @@ function appVersion(): string {
   return document.querySelector('meta[name="app-version"]')?.getAttribute('content') ?? 'dev';
 }
 
-export default function App() {
+// `initialJobs` is an optional seam for tests and the DEV-only UI preview harness to
+// render the file list with fixtures. Production (`main.tsx`) renders <App/> with none.
+export default function App({ initialJobs = [] }: { initialJobs?: FileJob[] } = {}) {
   const { message } = AntApp.useApp();
   const { locked, unlock, lock } = useSession();
   const [ready, setReady] = useState(false);
-  const [jobs, setJobs] = useState<FileJob[]>([]);
+  const [jobs, setJobs] = useState<FileJob[]>(initialJobs);
   const [openDoc, setOpenDoc] = useState<DocKey | null>(null);
   const [inbound, setInbound] = useState<InboundShare | null>(null);
 
