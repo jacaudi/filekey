@@ -1,7 +1,7 @@
 # =============================================================
 # Stage 1 — Build the web bundle (Vite)
 # =============================================================
-FROM node:22-alpine AS web-build
+FROM node:24-alpine AS web-build
 
 WORKDIR /build/web
 COPY web/package.json web/package-lock.json ./
